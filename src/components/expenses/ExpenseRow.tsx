@@ -1,0 +1,65 @@
+import { useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { AddExpenseDialog } from './AddExpenseDialog'
+import { useDeleteExpense } from '@/hooks/useExpenses'
+import type { Expense, Category } from '@/types/index'
+
+interface ExpenseRowProps {
+  expense: Expense
+  category?: Category
+}
+
+export function ExpenseRow({ expense, category }: ExpenseRowProps) {
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const deleteExpense = useDeleteExpense()
+
+  const date = new Date(expense.expense_date + 'T00:00:00').toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3 py-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {category && (
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: category.color }}
+            />
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{category?.name ?? 'Unknown'}</p>
+            {expense.description && (
+              <p className="truncate text-xs text-muted-foreground">{expense.description}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-sm font-medium">${Number(expense.amount).toFixed(2)}</span>
+          <span className="hidden text-xs text-muted-foreground sm:block">{date}</span>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteOpen(true)}>
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      <AddExpenseDialog open={editOpen} onOpenChange={setEditOpen} editing={expense} />
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Delete expense"
+        description="This action cannot be undone."
+        onConfirm={() => deleteExpense.mutate(expense.id)}
+        isLoading={deleteExpense.isPending}
+      />
+    </>
+  )
+}
