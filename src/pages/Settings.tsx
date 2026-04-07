@@ -1,3 +1,9 @@
+import { PageShell } from '@/components/layout/PageShell'
+
 export default function Settings() {
-  return <div>Settings — coming soon</div>
+  return (
+    <PageShell>
+      <h1 className="text-2xl font-semibold">Settings</h1>
+    </PageShell>
+  )
 }

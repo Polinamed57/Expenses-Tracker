@@ -1,3 +1,9 @@
+import { PageShell } from '@/components/layout/PageShell'
+
 export default function Profile() {
-  return <div>Profile — coming soon</div>
+  return (
+    <PageShell>
+      <h1 className="text-2xl font-semibold">Profile</h1>
+    </PageShell>
+  )
 }
