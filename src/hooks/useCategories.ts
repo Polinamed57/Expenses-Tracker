@@ -3,10 +3,8 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/providers/AuthProvider'
 import type { Category } from '@/types/index'
 
-// Ключ для кэша TanStack Query — по нему он знает что обновить после мутации
 const QUERY_KEY = 'categories'
 
-// Читаем все категории текущего пользователя (не архивные)
 export function useCategories() {
   const { session } = useAuth()
 
@@ -26,7 +24,6 @@ export function useCategories() {
   })
 }
 
-// Добавляем новую категорию
 export function useAddCategory() {
   const queryClient = useQueryClient()
   const { session } = useAuth()
@@ -39,12 +36,10 @@ export function useAddCategory() {
       })
       if (error) throw error
     },
-    // После успешного добавления — обновляем кэш, UI перерисуется автоматически
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   })
 }
 
-// Обновляем существующую категорию
 export function useUpdateCategory() {
   const queryClient = useQueryClient()
 
@@ -60,7 +55,7 @@ export function useUpdateCategory() {
   })
 }
 
-// Архивируем категорию (не удаляем, чтобы старые расходы остались)
+// Archive instead of delete to preserve historical expense data
 export function useArchiveCategory() {
   const queryClient = useQueryClient()
 
