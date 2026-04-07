@@ -8,20 +8,17 @@ interface UseMonthlyTotalsParams {
   month: number
 }
 
-// Считает итоги по категориям за месяц — питает оба графика (pie и bar)
 export function useMonthlyTotals({ year, month }: UseMonthlyTotalsParams) {
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses({ year, month })
   const { data: categories = [], isLoading: categoriesLoading } = useCategories()
 
   const totals = useMemo<MonthlyTotal[]>(() => {
-    // Группируем расходы по category_id и суммируем amount
     const sumByCategory: Record<string, number> = {}
     for (const expense of expenses) {
       sumByCategory[expense.category_id] =
         (sumByCategory[expense.category_id] ?? 0) + Number(expense.amount)
     }
 
-    // Объединяем с данными категорий (цвет, лимит, имя)
     return categories
       .filter((cat) => sumByCategory[cat.id] !== undefined)
       .map((cat) => ({

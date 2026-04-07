@@ -5,17 +5,14 @@ import type { Expense } from '@/types/index'
 
 const QUERY_KEY = 'expenses'
 
-// Параметры запроса: год и месяц (например, 2026, 4 = апрель)
 interface UseExpensesParams {
   year: number
   month: number
 }
 
-// Возвращает все расходы за указанный месяц
 export function useExpenses({ year, month }: UseExpensesParams) {
   const { session } = useAuth()
 
-  // Считаем первый и последний день месяца для фильтра
   const from = `${year}-${String(month).padStart(2, '0')}-01`
   const to = new Date(year, month, 0).toISOString().split('T')[0]
 
@@ -48,7 +45,6 @@ export function useAddExpense() {
       })
       if (error) throw error
     },
-    // Инвалидируем весь кэш expenses — обновятся все открытые месяцы
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   })
 }

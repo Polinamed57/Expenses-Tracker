@@ -40,7 +40,6 @@ export function RegisterForm() {
       setServerError(error.message)
       return
     }
-    // Supabase sends a confirmation email by default
     setSuccess(true)
     setTimeout(() => navigate('/login'), 3000)
   }
