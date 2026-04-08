@@ -85,6 +85,7 @@ export function useUpdateExpense() {
 
 export function useDeleteExpense() {
   const queryClient = useQueryClient()
+  const { session } = useAuth()
 
   return useMutation({
     mutationFn: async (expense: Pick<Expense, 'id' | 'category_id' | 'expense_date'>) => {
@@ -92,9 +93,11 @@ export function useDeleteExpense() {
       if (error) throw error
       return expense
     },
-    onSuccess: () => {
+    onSuccess: (expense) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
       toast.success('Expense deleted')
+      const d = new Date(expense.expense_date)
+      upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
     },
     onError: () => toast.error('Failed to delete expense'),
   })

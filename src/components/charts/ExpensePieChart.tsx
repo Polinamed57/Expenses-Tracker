@@ -73,7 +73,6 @@ export function ExpensePieChart({ totals }: ExpensePieChartProps) {
           nameKey="category_name"
           cx="50%"
           cy="50%"
-          innerRadius={44}
           outerRadius={BASE_RADIUS}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           shape={(props: any) => <CustomSector {...props} />}

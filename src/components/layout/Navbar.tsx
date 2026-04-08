@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, Moon, Sun } from 'lucide-react'
+import { Menu, Moon, Sun, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
@@ -19,6 +20,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   function toggleTheme() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -31,8 +33,11 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link to="/" className="text-base font-semibold tracking-tight">
-          Expenses Tracker
+        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground no-underline">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <TrendingUp className="h-4 w-4" />
+          </span>
+          <span className="text-base">Expenses Tracker</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -48,7 +53,7 @@ export function Navbar() {
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent transition-colors" aria-label="Open menu">
               <Menu className="h-4 w-4" />
             </SheetTrigger>
@@ -59,6 +64,7 @@ export function Navbar() {
                     key={link.to}
                     to={link.to}
                     end={link.to === '/'}
+                    onClick={() => setMobileOpen(false)}
                     className={({ isActive }) =>
                       `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                         isActive

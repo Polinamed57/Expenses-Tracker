@@ -60,19 +60,16 @@ export function HistoryChart() {
               <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={48} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent))' }} />
               <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                {points.map((point) => (
-                  <Cell
-                    key={`${point.year}-${point.month}`}
-                    fill={
-                      point.year === currentYear && point.month === currentMonth
-                        ? 'hsl(var(--primary))'
-                        : 'hsl(var(--muted-foreground))'
-                    }
-                    opacity={
-                      point.year === currentYear && point.month === currentMonth ? 1 : 0.45
-                    }
-                  />
-                ))}
+                {points.map((point) => {
+                  const isCurrent = point.year === currentYear && point.month === currentMonth
+                  return (
+                    <Cell
+                      key={`${point.year}-${point.month}`}
+                      fill="#6366f1"
+                      opacity={isCurrent ? 1 : 0.35}
+                    />
+                  )
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>

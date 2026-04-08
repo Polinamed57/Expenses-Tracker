@@ -49,12 +49,16 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { expense_date: defaultDate ?? today, amount: '' },
   })
+
+  const selectedCategoryId = watch('category_id')
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId)
 
   useEffect(() => {
     if (editing) {
@@ -71,7 +75,12 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
 
   async function onSubmit(values: FormValues) {
     const amount = parseFloat(values.amount)
-    const payload = { category_id: values.category_id, amount, description: values.description || null, expense_date: values.expense_date }
+    const payload = {
+      category_id: values.category_id,
+      amount,
+      description: values.description || null,
+      expense_date: values.expense_date,
+    }
     if (editing) {
       await updateExpense.mutateAsync({ id: editing.id, ...payload })
     } else {
@@ -82,11 +91,26 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>{editing ? 'Edit expense' : 'New expense'}</DialogTitle>
+          <div className="flex items-center gap-3">
+            {selectedCategory ? (
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white text-xs font-bold shadow-sm"
+                style={{ backgroundColor: selectedCategory.color }}
+              >
+                {selectedCategory.name[0].toUpperCase()}
+              </span>
+            ) : (
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground text-xs font-bold">
+                $
+              </span>
+            )}
+            <DialogTitle>{editing ? 'Edit expense' : 'New expense'}</DialogTitle>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-2">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 pt-2">
           <div className="flex flex-col gap-2">
             <Label>Category</Label>
             <Select
@@ -99,41 +123,48 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                      {cat.name}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {errors.category_id && (
-              <p className="text-sm text-destructive">{errors.category_id.message}</p>
+              <p className="text-xs text-destructive">{errors.category_id.message}</p>
             )}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="amount">Amount</Label>
-            <Input id="amount" type="number" step="0.01" placeholder="0.00" {...register('amount')} />
-            {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
+          <div className="flex gap-4">
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="amount">Amount</Label>
+              <Input id="amount" type="number" step="0.01" min="0" placeholder="0.00" {...register('amount')} />
+              {errors.amount && <p className="text-xs text-destructive">{errors.amount.message}</p>}
+            </div>
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="expense_date">Date</Label>
+              <Input id="expense_date" type="date" {...register('expense_date')} />
+              {errors.expense_date && (
+                <p className="text-xs text-destructive">{errors.expense_date.message}</p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="expense_date">Date</Label>
-            <Input id="expense_date" type="date" {...register('expense_date')} />
-            {errors.expense_date && (
-              <p className="text-sm text-destructive">{errors.expense_date.message}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">Note (optional)</Label>
+            <Label htmlFor="description">Note <span className="text-muted-foreground font-normal">(optional)</span></Label>
             <Input id="description" placeholder="e.g. Monthly rent" {...register('description')} />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {editing ? 'Save' : 'Add'}
+              {editing ? 'Save changes' : 'Add expense'}
             </Button>
           </div>
         </form>

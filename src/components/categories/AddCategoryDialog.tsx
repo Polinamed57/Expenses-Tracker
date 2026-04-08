@@ -36,11 +36,14 @@ export function AddCategoryDialog({ open, onOpenChange, editing }: AddCategoryDi
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { color: '#6366f1', budget_limit: '' },
   })
+
+  const colorValue = watch('color')
 
   useEffect(() => {
     if (editing) {
@@ -62,47 +65,55 @@ export function AddCategoryDialog({ open, onOpenChange, editing }: AddCategoryDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>{editing ? 'Edit category' : 'New category'}</DialogTitle>
+          <div className="flex items-center gap-3">
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white text-base font-bold shadow-sm"
+              style={{ backgroundColor: colorValue }}
+            >
+              {watch('name')?.[0]?.toUpperCase() ?? '#'}
+            </span>
+            <DialogTitle>{editing ? 'Edit category' : 'New category'}</DialogTitle>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-2">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 pt-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="e.g. Rent" {...register('name')} />
-            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+            <Input id="name" placeholder="e.g. Groceries" autoFocus {...register('name')} />
+            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="budget_limit">Monthly budget limit</Label>
-            <Input
-              id="budget_limit"
-              type="number"
-              step="0.01"
-              placeholder="Optional"
-              {...register('budget_limit')}
-            />
-            {errors.budget_limit && (
-              <p className="text-sm text-destructive">{errors.budget_limit.message}</p>
-            )}
+          <div className="flex gap-4">
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="budget_limit">Monthly limit</Label>
+              <Input
+                id="budget_limit"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="No limit"
+                {...register('budget_limit')}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="color">Color</Label>
+              <input
+                id="color"
+                type="color"
+                className="h-10 w-14 cursor-pointer rounded-md border border-input bg-transparent p-1"
+                {...register('color')}
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="color">Color</Label>
-            <input
-              id="color"
-              type="color"
-              className="h-9 w-16 cursor-pointer rounded-md border border-input bg-transparent p-1"
-              {...register('color')}
-            />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {editing ? 'Save' : 'Add'}
+              {editing ? 'Save changes' : 'Add category'}
             </Button>
           </div>
         </form>
