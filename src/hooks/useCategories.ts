@@ -70,3 +70,36 @@ export function useArchiveCategory() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
   })
 }
+
+export function useUnarchiveCategory() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('categories')
+        .update({ is_archived: false, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+  })
+}
+
+export function useAllCategories() {
+  const { session } = useAuth()
+
+  return useQuery({
+    queryKey: [QUERY_KEY, 'all', session?.user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('sort_order')
+
+      if (error) throw error
+      return data as Category[]
+    },
+    enabled: !!session,
+  })
+}
