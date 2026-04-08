@@ -58,7 +58,7 @@ export function HistoryChart() {
             <BarChart data={points} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
               <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={48} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent))' }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.12)' }} />
               <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={48}>
                 {points.map((point) => {
                   const isCurrent = point.year === currentYear && point.month === currentMonth

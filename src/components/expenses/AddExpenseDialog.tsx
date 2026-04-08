@@ -16,7 +16,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select'
 import { useCategories } from '@/hooks/useCategories'
 import { useAddExpense, useUpdateExpense } from '@/hooks/useExpenses'
@@ -93,32 +92,28 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            {selectedCategory ? (
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white text-xs font-bold shadow-sm"
-                style={{ backgroundColor: selectedCategory.color }}
-              >
-                {selectedCategory.name[0].toUpperCase()}
-              </span>
-            ) : (
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground text-xs font-bold">
-                $
-              </span>
-            )}
-            <DialogTitle>{editing ? 'Edit expense' : 'New expense'}</DialogTitle>
-          </div>
+          <DialogTitle>{editing ? 'Edit expense' : 'New expense'}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 pt-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 pt-3">
           <div className="flex flex-col gap-2">
             <Label>Category</Label>
             <Select
-              defaultValue={editing?.category_id ?? undefined}
+              value={selectedCategoryId || undefined}
               onValueChange={(val) => setValue('category_id', val ?? '')}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+              <SelectTrigger className="w-full">
+                {selectedCategory ? (
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: selectedCategory.color }}
+                    />
+                    {selectedCategory.name}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">Select category</span>
+                )}
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (

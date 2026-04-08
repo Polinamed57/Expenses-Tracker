@@ -78,7 +78,7 @@ export function AddCategoryDialog({ open, onOpenChange, editing }: AddCategoryDi
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 pt-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 pt-3">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" placeholder="e.g. Groceries" autoFocus {...register('name')} />
