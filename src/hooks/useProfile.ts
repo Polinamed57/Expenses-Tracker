@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/providers/AuthProvider'
 import type { Profile } from '@/types/index'
@@ -36,6 +37,10 @@ export function useUpdateProfile() {
         .eq('id', session!.user.id)
       if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Profile saved')
+    },
+    onError: () => toast.error('Failed to save profile'),
   })
 }

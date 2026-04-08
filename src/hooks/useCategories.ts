@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/providers/AuthProvider'
 import type { Category } from '@/types/index'
@@ -36,7 +37,11 @@ export function useAddCategory() {
       })
       if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Category added')
+    },
+    onError: () => toast.error('Failed to add category'),
   })
 }
 
@@ -51,7 +56,11 @@ export function useUpdateCategory() {
         .eq('id', id)
       if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Category updated')
+    },
+    onError: () => toast.error('Failed to update category'),
   })
 }
 
@@ -67,7 +76,11 @@ export function useArchiveCategory() {
         .eq('id', id)
       if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Category archived')
+    },
+    onError: () => toast.error('Failed to archive category'),
   })
 }
 
@@ -82,7 +95,11 @@ export function useUnarchiveCategory() {
         .eq('id', id)
       if (error) throw error
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Category restored')
+    },
+    onError: () => toast.error('Failed to restore category'),
   })
 }
 

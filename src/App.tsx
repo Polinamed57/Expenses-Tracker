@@ -5,6 +5,7 @@ import { AuthProvider } from '@/providers/AuthProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { AuthGuard } from '@/components/auth/AuthGuard'
 
+import { Toaster } from 'sonner'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
@@ -46,6 +47,7 @@ export default function App() {
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <Toaster position="bottom-right" richColors />
           </BrowserRouter>
         </AuthProvider>
       </QueryClientProvider>

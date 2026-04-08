@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/providers/AuthProvider'
 import { upsertSnapshot } from '@/lib/snapshots'
@@ -49,9 +50,11 @@ export function useAddExpense() {
     },
     onSuccess: (values) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Expense added')
       const d = new Date(values.expense_date)
       upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
     },
+    onError: () => toast.error('Failed to add expense'),
   })
 }
 
@@ -70,11 +73,13 @@ export function useUpdateExpense() {
     },
     onSuccess: (values) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Expense updated')
       if (values.category_id && values.expense_date) {
         const d = new Date(values.expense_date)
         upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
       }
     },
+    onError: () => toast.error('Failed to update expense'),
   })
 }
 
@@ -87,8 +92,10 @@ export function useDeleteExpense() {
       if (error) throw error
       return expense
     },
-    onSuccess: (_result, expense) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Expense deleted')
     },
+    onError: () => toast.error('Failed to delete expense'),
   })
 }

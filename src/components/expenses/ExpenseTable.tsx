@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ExpenseRow } from './ExpenseRow'
 import { AddExpenseDialog } from './AddExpenseDialog'
@@ -33,9 +33,23 @@ export function ExpenseTable({ year, month }: ExpenseTableProps) {
 
       <div className="rounded-lg border border-border bg-card">
         {isLoading ? (
-          <p className="p-4 text-sm text-muted-foreground">Loading...</p>
+          <div className="divide-y divide-border px-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between gap-3 py-3 animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+                  <div className="h-4 w-28 rounded bg-muted" />
+                </div>
+                <div className="h-4 w-16 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
         ) : expenses.length === 0 ? (
-          <p className="p-4 text-sm text-muted-foreground">No expenses this month.</p>
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <Receipt className="h-8 w-8 text-muted-foreground/50" />
+            <p className="text-sm font-medium">No expenses this month</p>
+            <p className="text-xs text-muted-foreground">Add your first expense to get started</p>
+          </div>
         ) : (
           <div className="divide-y divide-border px-4">
             {expenses.map((expense) => (
