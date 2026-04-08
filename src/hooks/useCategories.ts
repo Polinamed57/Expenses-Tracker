@@ -103,6 +103,39 @@ export function useUnarchiveCategory() {
   })
 }
 
+export function useDeleteCategory() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('categories').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Category deleted')
+    },
+    onError: () => toast.error('Cannot delete — category has expenses'),
+  })
+}
+
+export function useCategoryHasExpenses(categoryId: string) {
+  const { session } = useAuth()
+
+  return useQuery({
+    queryKey: ['category-has-expenses', categoryId],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('expenses')
+        .select('id', { count: 'exact', head: true })
+        .eq('category_id', categoryId)
+      if (error) throw error
+      return (count ?? 0) > 0
+    },
+    enabled: !!session && !!categoryId,
+  })
+}
+
 export function useAllCategories() {
   const { session } = useAuth()
 
