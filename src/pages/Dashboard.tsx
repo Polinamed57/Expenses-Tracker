@@ -10,6 +10,7 @@ import { ChartToggle } from '@/components/charts/ChartToggle'
 import type { ChartType } from '@/components/charts/ChartToggle'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useMonthlyIncome, useSetMonthlyIncome } from '@/hooks/useMonthlyIncome'
+import { useSeedRecurringExpenses } from '@/hooks/useExpenses'
 import { HistoryChart } from '@/components/charts/HistoryChart'
 import {
   Dialog,
@@ -58,6 +59,7 @@ export default function Dashboard() {
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
 
+  useSeedRecurringExpenses(year, month)
   const { totals } = useMonthlyTotals({ year, month })
   const { data: income } = useMonthlyIncome(year, month)
   const setIncome = useSetMonthlyIncome()
@@ -112,6 +114,34 @@ export default function Dashboard() {
             alert={overBudgetCount > 0}
           />
         </div>
+
+        {totalLimit > 0 && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Overall budget</span>
+              <span className="font-medium tabular-nums">
+                ${totalSpent.toFixed(0)}
+                <span className="text-muted-foreground font-normal"> / ${totalLimit.toFixed(0)}</span>
+              </span>
+            </div>
+            <div style={{ height: '8px', borderRadius: '9999px', backgroundColor: 'rgba(150,150,150,0.2)' }}>
+              <div
+                style={{
+                  height: '8px',
+                  width: `${Math.min((totalSpent / totalLimit) * 100, 100)}%`,
+                  borderRadius: '9999px',
+                  background: totalSpent > totalLimit
+                    ? 'linear-gradient(to right, #ff4444, #ff0000)'
+                    : 'linear-gradient(to right, #4ade80, #facc15, #f97316, #ef4444)',
+                  backgroundSize: totalSpent <= totalLimit
+                    ? `${(10000 / Math.min((totalSpent / totalLimit) * 100, 100)).toFixed(1)}% 100%`
+                    : undefined,
+                  transition: 'width 0.5s ease',
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         <CategoryList totals={totals} />
 
