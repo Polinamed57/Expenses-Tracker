@@ -8,6 +8,7 @@ import { ExpenseBarChart } from '@/components/charts/ExpenseBarChart'
 import { ChartToggle } from '@/components/charts/ChartToggle'
 import type { ChartType } from '@/components/charts/ChartToggle'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
+import { HistoryChart } from '@/components/charts/HistoryChart'
 
 export default function Dashboard() {
   const now = new Date()
@@ -45,6 +46,8 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        <HistoryChart />
 
         <ExpenseTable year={year} month={month} />
       </div>

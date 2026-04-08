@@ -57,7 +57,7 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
         onOpenChange={setDeleteOpen}
         title="Delete expense"
         description="This action cannot be undone."
-        onConfirm={() => deleteExpense.mutate(expense.id)}
+        onConfirm={() => deleteExpense.mutate({ id: expense.id, category_id: expense.category_id, expense_date: expense.expense_date })}
         isLoading={deleteExpense.isPending}
       />
     </>

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/providers/AuthProvider'
+import { upsertSnapshot } from '@/lib/snapshots'
 import type { Expense } from '@/types/index'
 
 const QUERY_KEY = 'expenses'
@@ -44,13 +45,19 @@ export function useAddExpense() {
         user_id: session!.user.id,
       })
       if (error) throw error
+      return values
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: (values) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      const d = new Date(values.expense_date)
+      upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
+    },
   })
 }
 
 export function useUpdateExpense() {
   const queryClient = useQueryClient()
+  const { session } = useAuth()
 
   return useMutation({
     mutationFn: async ({ id, ...values }: Partial<Expense> & { id: string }) => {
@@ -59,8 +66,15 @@ export function useUpdateExpense() {
         .update({ ...values, updated_at: new Date().toISOString() })
         .eq('id', id)
       if (error) throw error
+      return values
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: (values) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      if (values.category_id && values.expense_date) {
+        const d = new Date(values.expense_date)
+        upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
+      }
+    },
   })
 }
 
@@ -68,10 +82,13 @@ export function useDeleteExpense() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('expenses').delete().eq('id', id)
+    mutationFn: async (expense: Pick<Expense, 'id' | 'category_id' | 'expense_date'>) => {
+      const { error } = await supabase.from('expenses').delete().eq('id', expense.id)
       if (error) throw error
+      return expense
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: (_result, expense) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
   })
 }
