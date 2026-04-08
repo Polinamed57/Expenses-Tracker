@@ -26,6 +26,7 @@ export interface Expense {
   amount: number
   description: string | null
   expense_date: string
+  is_recurring: boolean
   created_at: string
   updated_at: string
 }

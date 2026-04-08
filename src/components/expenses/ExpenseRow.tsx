@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Repeat2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { AddExpenseDialog } from './AddExpenseDialog'
@@ -27,8 +27,14 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
         <div className="flex items-center gap-3 min-w-0">
           {category && (
             <span
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: category.color }}
+              style={{
+                backgroundColor: category.color,
+                width: '10px',
+                height: '10px',
+                borderRadius: '9999px',
+                flexShrink: 0,
+                display: 'inline-block',
+              }}
             />
           )}
           <div className="min-w-0">
@@ -40,6 +46,9 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          {expense.is_recurring && (
+            <Repeat2 className="h-3.5 w-3.5 text-muted-foreground" title="Repeats monthly" />
+          )}
           <span className="text-xs text-muted-foreground">{date}</span>
           <span className="text-sm font-semibold tabular-nums">${Number(expense.amount).toFixed(2)}</span>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>

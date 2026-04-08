@@ -40,7 +40,7 @@ export function useAddExpense() {
   const { session } = useAuth()
 
   return useMutation({
-    mutationFn: async (values: Pick<Expense, 'category_id' | 'amount' | 'description' | 'expense_date'>) => {
+    mutationFn: async (values: Pick<Expense, 'category_id' | 'amount' | 'description' | 'expense_date' | 'is_recurring'>) => {
       const { error } = await supabase.from('expenses').insert({
         ...values,
         user_id: session!.user.id,
@@ -80,6 +80,56 @@ export function useUpdateExpense() {
       }
     },
     onError: () => toast.error('Failed to update expense'),
+  })
+}
+
+// Copies recurring expenses from previous month into current month if not already present
+export function useSeedRecurringExpenses(year: number, month: number) {
+  const { session } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useQuery({
+    queryKey: ['seed-recurring', session?.user.id, year, month],
+    queryFn: async () => {
+      const prevDate = new Date(year, month - 2, 1)
+      const prevYear = prevDate.getFullYear()
+      const prevMonth = prevDate.getMonth() + 1
+      const prevFrom = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01`
+      const prevTo = new Date(prevYear, prevMonth, 0).toISOString().split('T')[0]
+
+      const curFrom = `${year}-${String(month).padStart(2, '0')}-01`
+      const curTo = new Date(year, month, 0).toISOString().split('T')[0]
+
+      const [{ data: prevExpenses }, { data: curExpenses }] = await Promise.all([
+        supabase.from('expenses').select('*').eq('is_recurring', true).gte('expense_date', prevFrom).lte('expense_date', prevTo),
+        supabase.from('expenses').select('category_id').gte('expense_date', curFrom).lte('expense_date', curTo),
+      ])
+
+      if (!prevExpenses?.length) return null
+
+      const curCategoryIds = new Set((curExpenses ?? []).map((e) => e.category_id))
+      // only copy recurring expenses for categories not yet present this month
+      const toInsert = prevExpenses
+        .filter((e) => !curCategoryIds.has(e.category_id))
+        .map((e) => ({
+          user_id: session!.user.id,
+          category_id: e.category_id,
+          amount: e.amount,
+          description: e.description,
+          is_recurring: true,
+          expense_date: curFrom,
+        }))
+
+      if (!toInsert.length) return null
+
+      const { error } = await supabase.from('expenses').insert(toInsert)
+      if (error) throw error
+
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      return toInsert.length
+    },
+    enabled: !!session,
+    staleTime: Infinity, // only run once per month/session
   })
 }
 

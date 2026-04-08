@@ -26,6 +26,7 @@ const schema = z.object({
   amount: z.string().min(1, 'Enter an amount'),
   description: z.string().optional(),
   expense_date: z.string().min(1, 'Select a date'),
+  is_recurring: z.boolean(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -53,7 +54,7 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { expense_date: defaultDate ?? today, amount: '' },
+    defaultValues: { expense_date: defaultDate ?? today, amount: '', is_recurring: false },
   })
 
   const selectedCategoryId = watch('category_id')
@@ -66,9 +67,10 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
         amount: String(editing.amount),
         description: editing.description ?? '',
         expense_date: editing.expense_date,
+        is_recurring: editing.is_recurring,
       })
     } else {
-      reset({ category_id: '', amount: '', description: '', expense_date: defaultDate ?? today })
+      reset({ category_id: '', amount: '', description: '', expense_date: defaultDate ?? today, is_recurring: false })
     }
   }, [editing, open, reset, defaultDate, today])
 
@@ -79,6 +81,7 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
       amount,
       description: values.description || null,
       expense_date: values.expense_date,
+      is_recurring: values.is_recurring,
     }
     if (editing) {
       await updateExpense.mutateAsync({ id: editing.id, ...payload })
@@ -153,6 +156,15 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
             <Label htmlFor="description">Note <span className="text-muted-foreground font-normal">(optional)</span></Label>
             <Input id="description" placeholder="e.g. Monthly rent" {...register('description')} />
           </div>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-input accent-primary"
+              {...register('is_recurring')}
+            />
+            <span className="text-sm text-muted-foreground">Repeat monthly</span>
+          </label>
 
           <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
