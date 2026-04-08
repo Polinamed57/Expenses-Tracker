@@ -47,7 +47,7 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
 
         <div className="flex shrink-0 items-center gap-2">
           {expense.is_recurring && (
-            <Repeat2 className="h-3.5 w-3.5 text-muted-foreground" title="Repeats monthly" />
+            <Repeat2 className="h-3.5 w-3.5 text-muted-foreground" aria-label="Repeats monthly" />
           )}
           <span className="text-xs text-muted-foreground">{date}</span>
           <span className="text-sm font-semibold tabular-nums">${Number(expense.amount).toFixed(2)}</span>

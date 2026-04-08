@@ -94,7 +94,6 @@ export default function Settings() {
         onOpenChange={(open) => !open && setArchivingId(null)}
         title="Archive category?"
         description="The category will be hidden from the dashboard. Existing expenses are preserved."
-        confirmLabel="Archive"
         onConfirm={confirmArchive}
       />
     </PageShell>
