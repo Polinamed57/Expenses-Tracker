@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -6,9 +6,11 @@ import { PageShell } from '@/components/layout/PageShell'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useAuth } from '@/providers/AuthProvider'
+import { supabase } from '@/lib/supabase'
 
 const schema = z.object({
   display_name: z.string().min(1, 'Enter your name'),
@@ -29,6 +31,7 @@ export default function Profile() {
   const { data: profile } = useProfile()
   const updateProfile = useUpdateProfile()
   const { theme, setTheme } = useTheme()
+  const [signOutOpen, setSignOutOpen] = useState(false)
 
   const {
     register,
@@ -94,6 +97,7 @@ export default function Profile() {
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Appearance
           </h2>
+
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex gap-2">
               {themeOptions.map((opt) => (
@@ -109,7 +113,29 @@ export default function Profile() {
             </div>
           </div>
         </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            Session
+          </h2>
+          <div className="rounded-lg border border-border bg-card p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Signed in as {session?.user.email}</p>
+              <Button variant="outline" onClick={() => setSignOutOpen(true)}>
+                Sign out
+              </Button>
+            </div>
+          </div>
+        </section>
       </div>
+
+      <ConfirmDialog
+        open={signOutOpen}
+        onOpenChange={setSignOutOpen}
+        title="Sign out"
+        description="Are you sure you want to sign out?"
+        onConfirm={() => supabase.auth.signOut()}
+      />
     </PageShell>
   )
 }
