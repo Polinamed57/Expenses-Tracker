@@ -20,19 +20,17 @@ export function CategoryCard({ category, total }: CategoryCardProps) {
   const limit = category.budget_limit
   const isOverBudget = limit !== null && spent > limit
   const progress = limit ? Math.min((spent / limit) * 100, 100) : null
+  const percentage = limit ? Math.round((spent / limit) * 100) : null
 
   return (
     <>
-      <div className="rounded-lg border border-border bg-card p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span
-              className="h-3 w-3 shrink-0 rounded-full"
-              style={{ backgroundColor: category.color }}
-            />
-            <span className="text-sm font-medium">{category.name}</span>
-          </div>
-          <div className="flex items-center gap-1">
+      <div
+        className="rounded-lg border border-border bg-card p-4 shadow-sm flex flex-col gap-3"
+        style={{ borderLeftColor: category.color, borderLeftWidth: '3px' }}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-medium truncate">{category.name}</span>
+          <div className="flex items-center gap-0.5 shrink-0">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>
               <Pencil className="h-3.5 w-3.5" />
             </Button>
@@ -42,21 +40,31 @@ export function CategoryCard({ category, total }: CategoryCardProps) {
           </div>
         </div>
 
-        <div className="mt-3 flex items-baseline justify-between text-sm">
-          <span className={isOverBudget ? 'font-medium text-destructive' : 'font-medium'}>
+        <div className="flex items-baseline justify-between gap-2">
+          <span className={`text-2xl font-bold tabular-nums ${isOverBudget ? 'text-destructive' : ''}`}>
             ${spent.toFixed(2)}
           </span>
           {limit !== null && (
-            <span className="text-xs text-muted-foreground">of ${limit.toFixed(2)}</span>
+            <span className="text-xs text-muted-foreground shrink-0">
+              of ${limit.toFixed(2)}
+            </span>
           )}
         </div>
 
         {progress !== null && (
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className={`h-full rounded-full transition-all ${isOverBudget ? 'bg-destructive' : 'bg-primary'}`}
-              style={{ width: `${progress}%` }}
-            />
+          <div className="flex flex-col gap-1.5">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full rounded-full transition-all ${isOverBudget ? 'bg-destructive' : 'bg-primary'}`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{percentage}% used</span>
+              {isOverBudget && (
+                <span className="text-destructive font-medium">Over budget</span>
+              )}
+            </div>
           </div>
         )}
       </div>

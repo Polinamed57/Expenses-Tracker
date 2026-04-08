@@ -61,10 +61,17 @@ export default function Profile() {
             Account
           </h2>
           <div className="rounded-lg border border-border bg-card p-5 flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label>Email</Label>
-              <p className="text-sm text-muted-foreground">{session?.user.email}</p>
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-lg font-bold select-none">
+                {(profile?.display_name || session?.user.email || '?')[0].toUpperCase()}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="font-medium">{profile?.display_name ?? 'No name set'}</p>
+                <p className="text-sm text-muted-foreground">{session?.user.email}</p>
+              </div>
             </div>
+
+            <div className="h-px bg-border" />
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">

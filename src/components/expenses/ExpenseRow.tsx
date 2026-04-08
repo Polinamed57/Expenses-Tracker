@@ -40,8 +40,8 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <span className="text-sm font-medium">${Number(expense.amount).toFixed(2)}</span>
-          <span className="hidden text-xs text-muted-foreground sm:block">{date}</span>
+          <span className="text-xs text-muted-foreground">{date}</span>
+          <span className="text-sm font-semibold tabular-nums">${Number(expense.amount).toFixed(2)}</span>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>
             <Pencil className="h-3.5 w-3.5" />
           </Button>
