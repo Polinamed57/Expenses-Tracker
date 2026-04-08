@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Plus, Tag } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { CategoryCard } from './CategoryCard'
 import { AddCategoryDialog } from './AddCategoryDialog'
 import { useCategories } from '@/hooks/useCategories'
@@ -12,13 +11,12 @@ interface CategoryListProps {
 
 function CategorySkeleton() {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3 animate-pulse">
+    <div className="aspect-square w-full rounded-xl border border-border bg-card p-4 animate-pulse flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <div className="h-3 w-3 rounded-full bg-muted" />
-        <div className="h-4 w-24 rounded bg-muted" />
+        <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+        <div className="h-4 w-20 rounded bg-muted" />
       </div>
-      <div className="h-2 w-full rounded bg-muted" />
-      <div className="h-3 w-16 rounded bg-muted" />
+      <div className="mt-auto h-7 w-16 rounded bg-muted" />
     </div>
   )
 }
@@ -31,29 +29,26 @@ export function CategoryList({ totals }: CategoryListProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Categories</h2>
-        <Button size="sm" onClick={() => setAddOpen(true)}>
-          <Plus className="mr-1.5 h-4 w-4" />
-          Add
-        </Button>
-      </div>
+      <h2 className="text-lg font-semibold">Categories</h2>
 
       {isLoading ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => <CategorySkeleton key={i} />)}
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-5">
+          {Array.from({ length: 4 }).map((_, i) => <CategorySkeleton key={i} />)}
         </div>
       ) : categories.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border py-10 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-10 text-center">
           <Tag className="h-8 w-8 text-muted-foreground/50" />
           <p className="text-sm font-medium">No categories yet</p>
           <p className="text-xs text-muted-foreground">Add a category to start tracking expenses</p>
-          <Button size="sm" className="mt-2" onClick={() => setAddOpen(true)}>
+          <button
+            onClick={() => setAddOpen(true)}
+            className="mt-2 rounded-lg border border-border px-4 py-1.5 text-sm font-medium hover:bg-accent transition-colors"
+          >
             Add category
-          </Button>
+          </button>
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-5">
           {categories.map((cat) => (
             <CategoryCard
               key={cat.id}
@@ -61,6 +56,14 @@ export function CategoryList({ totals }: CategoryListProps) {
               total={totalsByCategory[cat.id]}
             />
           ))}
+          <button
+            onClick={() => setAddOpen(true)}
+            className="flex aspect-square w-full items-center justify-center rounded-xl border-2 border-dashed border-border text-muted-foreground shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            style={{ backgroundColor: 'var(--card)' }}
+            aria-label="Add category"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
         </div>
       )}
 

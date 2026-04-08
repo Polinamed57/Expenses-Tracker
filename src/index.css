@@ -1,9 +1,7 @@
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @theme inline {
   --color-background: var(--background);
@@ -117,8 +115,17 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0)
   }
-  * {
+  *:not(.recharts-sector):not(.recharts-pie path):not(svg):not(svg *) {
     @apply border-border outline-ring/50;
+  }
+  .recharts-wrapper *,
+  .recharts-wrapper *:focus,
+  .recharts-wrapper *:focus-visible {
+    outline: none !important;
+  }
+  @keyframes bar-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
   body {
     @apply bg-background text-foreground;

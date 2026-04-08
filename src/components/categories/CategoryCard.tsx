@@ -1,9 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Archive } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { AddCategoryDialog } from './AddCategoryDialog'
-import { useArchiveCategory } from '@/hooks/useCategories'
 import type { Category, MonthlyTotal } from '@/types/index'
 
 interface CategoryCardProps {
@@ -13,71 +9,76 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category, total }: CategoryCardProps) {
   const [editOpen, setEditOpen] = useState(false)
-  const [archiveOpen, setArchiveOpen] = useState(false)
-  const archiveCategory = useArchiveCategory()
 
   const spent = total?.total ?? 0
   const limit = category.budget_limit
-  const isOverBudget = limit !== null && spent > limit
   const progress = limit ? Math.min((spent / limit) * 100, 100) : null
   const percentage = limit ? Math.round((spent / limit) * 100) : null
+  const isOverBudget = limit !== null && spent > limit
+
+  // gradient spans full track so visible portion reflects usage; red pulse when over budget
+  const gradientSize = progress !== null && progress > 0
+    ? `${(10000 / progress).toFixed(1)}% 100%`
+    : '100% 100%'
 
   return (
     <>
-      <div
-        className="rounded-lg border border-border bg-card p-4 shadow-sm flex flex-col gap-3"
-        style={{ borderLeftColor: category.color, borderLeftWidth: '3px' }}
+      <button
+        onClick={() => setEditOpen(true)}
+        className="group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        style={{ padding: '12px' }}
       >
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-medium truncate">{category.name}</span>
-          <div className="flex items-center gap-0.5 shrink-0">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setArchiveOpen(true)}>
-              <Archive className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {category.icon ? (
+            <span style={{ fontSize: '16px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
+          ) : (
+            <span
+              style={{
+                backgroundColor: category.color,
+                width: '10px',
+                height: '10px',
+                borderRadius: '9999px',
+                flexShrink: 0,
+                display: 'inline-block',
+              }}
+            />
+          )}
+          <span className="truncate text-xs font-extrabold uppercase tracking-widest">{category.name}</span>
         </div>
 
-        <div className="flex items-baseline justify-between gap-2">
-          <span className={`text-2xl font-bold tabular-nums ${isOverBudget ? 'text-destructive' : ''}`}>
-            ${spent.toFixed(2)}
-          </span>
-          {limit !== null && (
-            <span className="text-xs text-muted-foreground shrink-0">
-              of ${limit.toFixed(2)}
-            </span>
-          )}
+        <div className="flex flex-1 items-center">
+          <p
+            className={isOverBudget ? 'text-destructive' : ''}
+            style={{ fontSize: '26px', fontWeight: 800, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}
+          >
+            ${spent.toFixed(0)}
+          </p>
         </div>
 
         {progress !== null && (
           <div className="flex flex-col gap-1.5">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <p className="text-[10px] text-muted-foreground">
+              {percentage}% of ${limit!.toFixed(0)}
+            </p>
+            <div style={{ height: '6px', borderRadius: '9999px', backgroundColor: 'rgba(150,150,150,0.25)' }}>
               <div
-                className={`h-full rounded-full transition-all ${isOverBudget ? 'bg-destructive' : 'bg-primary'}`}
-                style={{ width: `${progress}%` }}
+                style={{
+                  height: '6px',
+                  width: isOverBudget ? '100%' : `${progress}%`,
+                  borderRadius: '9999px',
+                  background: isOverBudget
+                    ? 'linear-gradient(to right, #ff4444, #ff0000)'
+                    : 'linear-gradient(to right, #4ade80, #facc15, #f97316, #ef4444)',
+                  backgroundSize: isOverBudget ? undefined : gradientSize,
+                  transition: 'width 0.5s ease',
+                }}
               />
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{percentage}% used</span>
-              {isOverBudget && (
-                <span className="text-destructive font-medium">Over budget</span>
-              )}
             </div>
           </div>
         )}
-      </div>
+      </button>
 
       <AddCategoryDialog open={editOpen} onOpenChange={setEditOpen} editing={category} />
-      <ConfirmDialog
-        open={archiveOpen}
-        onOpenChange={setArchiveOpen}
-        title="Archive category"
-        description={`Archive "${category.name}"? It will be hidden but past expenses will remain.`}
-        onConfirm={() => archiveCategory.mutate(category.id)}
-        isLoading={archiveCategory.isPending}
-      />
     </>
   )
 }
