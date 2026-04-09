@@ -134,6 +134,7 @@ export default function Profile() {
         onOpenChange={setSignOutOpen}
         title="Sign out"
         description="Are you sure you want to sign out?"
+        confirmLabel="Sign out"
         onConfirm={() => supabase.auth.signOut()}
       />
     </PageShell>

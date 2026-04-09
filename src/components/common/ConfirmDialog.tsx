@@ -15,6 +15,8 @@ interface ConfirmDialogProps {
   description: string
   onConfirm: () => void
   isLoading?: boolean
+  confirmLabel?: string
+  loadingLabel?: string
 }
 
 export function ConfirmDialog({
@@ -24,6 +26,8 @@ export function ConfirmDialog({
   description,
   onConfirm,
   isLoading,
+  confirmLabel = 'Delete',
+  loadingLabel,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -37,7 +41,7 @@ export function ConfirmDialog({
             Cancel
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? (loadingLabel ?? `${confirmLabel}...`) : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
