@@ -31,7 +31,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, alert, onEdit }: StatCardProps) {
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-3 sm:px-4">
+    <div className="card-hover rounded-lg border border-border bg-card px-3 py-3 sm:px-4">
       <div className="flex items-center justify-between gap-1">
         <p className="text-xs text-muted-foreground truncate">{label}</p>
         {onEdit && (

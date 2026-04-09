@@ -1,4 +1,4 @@
-import { Navbar } from './Navbar'
+import { Sidebar } from './Sidebar'
 
 interface PageShellProps {
   children: React.ReactNode
@@ -6,9 +6,9 @@ interface PageShellProps {
 
 export function PageShell({ children }: PageShellProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="mx-auto max-w-5xl px-4 py-8">
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--background)' }}>
+      <Sidebar />
+      <main style={{ marginLeft: '240px', flex: 1, padding: '32px', minWidth: 0 }}>
         {children}
       </main>
     </div>

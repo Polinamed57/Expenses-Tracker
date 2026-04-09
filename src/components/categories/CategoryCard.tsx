@@ -25,7 +25,7 @@ export function CategoryCard({ category, total }: CategoryCardProps) {
     <>
       <button
         onClick={() => setEditOpen(true)}
-        className="group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ padding: '12px' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
