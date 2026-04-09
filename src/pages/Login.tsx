@@ -11,7 +11,6 @@ export default function Login() {
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Sign in</CardTitle>
-            <CardDescription>Enter your credentials to continue</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
