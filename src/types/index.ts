@@ -42,6 +42,16 @@ export interface MonthlySnapshot {
   updated_at: string
 }
 
+export interface Goal {
+  id: string
+  user_id: string
+  title: string
+  target_amount: number
+  current_amount: number
+  emoji: string | null
+  created_at: string
+}
+
 export interface MonthlyTotal {
   category_id: string
   category_name: string

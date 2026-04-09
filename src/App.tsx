@@ -11,6 +11,7 @@ import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
 import Profile from '@/pages/Profile'
 import Settings from '@/pages/Settings'
+import Goals from '@/pages/Goals'
 
 export default function App() {
   return (
@@ -42,6 +43,14 @@ export default function App() {
                 element={
                   <AuthGuard>
                     <Settings />
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/goals"
+                element={
+                  <AuthGuard>
+                    <Goals />
                   </AuthGuard>
                 }
               />
