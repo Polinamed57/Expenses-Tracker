@@ -11,6 +11,7 @@ import type { ChartType } from '@/components/charts/ChartToggle'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useMonthlyIncome, useSetMonthlyIncome } from '@/hooks/useMonthlyIncome'
 import { useSeedRecurringExpenses } from '@/hooks/useExpenses'
+import { QuickAddExpense } from '@/components/expenses/QuickAddExpense'
 import { HistoryChart } from '@/components/charts/HistoryChart'
 import {
   Dialog,
@@ -95,6 +96,8 @@ export default function Dashboard() {
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
+
+        <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Total spent" value={`$${totalSpent.toFixed(2)}`} />
