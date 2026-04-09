@@ -27,8 +27,24 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
 
   const selectedCategory = categories.find((c) => c.id === categoryId)
 
+  // Parse amount from input like "Starbucks 12" or "12 lunch"
+  function parseInput(input: string): { text: string; parsedAmount: string } {
+    const match = input.match(/(\d+(\.\d+)?)/)
+    if (!match) return { text: input, parsedAmount: '' }
+    const parsedAmount = match[1]
+    const text = input.replace(match[0], '').trim()
+    return { text: text || input, parsedAmount }
+  }
+
+  function handleDescriptionChange(value: string) {
+    setDescription(value)
+    const { parsedAmount } = parseInput(value)
+    if (parsedAmount) setAmount(parsedAmount)
+  }
+
   useEffect(() => {
-    if (!description.trim() || !categories.length) return
+    const text = parseInput(description).text
+    if (!text.trim() || !categories.length) return
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(async () => {
@@ -38,7 +54,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            description,
+            description: text,
             categories: categories.map((c) => ({ id: c.id, name: c.name })),
           }),
         })
@@ -57,11 +73,12 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
   async function handleAdd() {
     const parsed = parseFloat(amount)
     if (!categoryId || isNaN(parsed) || parsed <= 0) return
+    const { text } = parseInput(description)
 
     await addExpense.mutateAsync({
       category_id: categoryId,
       amount: parsed,
-      description: description.trim() || null,
+      description: text.trim() || null,
       expense_date: defaultDate,
       is_recurring: false,
     })
@@ -99,12 +116,17 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
           }}
         />
         <Input
-          placeholder="What did you spend on?"
+          placeholder="e.g. Starbucks"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => handleDescriptionChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           style={{ paddingLeft: '30px' }}
         />
+        {isSuggesting && (
+          <p style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px', paddingLeft: '2px' }}>
+            Analyzing...
+          </p>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
