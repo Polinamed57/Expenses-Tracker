@@ -75,16 +75,17 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
     <div
       style={{
         display: 'flex',
+        flexDirection: 'column',
         gap: '8px',
-        alignItems: 'center',
         padding: '12px 16px',
         borderRadius: '12px',
         border: '1px solid var(--border)',
         background: 'var(--card)',
+        maxWidth: '680px',
       }}
     >
       {/* Description with sparkles prefix */}
-      <div style={{ position: 'relative', flex: 2, minWidth: 0 }}>
+      <div style={{ position: 'relative', width: '100%' }}>
         <Sparkles
           size={14}
           style={{
@@ -105,6 +106,8 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
           style={{ paddingLeft: '30px' }}
         />
       </div>
+
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
 
       {/* Category */}
       <div style={{ flex: 1.5, minWidth: '120px' }}>
@@ -159,6 +162,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
       >
         Add
       </Button>
+      </div>
     </div>
   )
 }

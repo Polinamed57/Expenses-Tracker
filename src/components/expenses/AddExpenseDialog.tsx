@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -59,28 +58,7 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
   })
 
   const selectedCategoryId = watch('category_id')
-  const description = watch('description')
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId)
-  const [isSuggesting, setIsSuggesting] = useState(false)
-
-  async function suggestCategory() {
-    if (!description?.trim() || !categories.length) return
-    setIsSuggesting(true)
-    try {
-      const res = await fetch('/api/categorize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description,
-          categories: categories.map((c) => ({ id: c.id, name: c.name })),
-        }),
-      })
-      const data = await res.json() as { category_id: string | null }
-      if (data.category_id) setValue('category_id', data.category_id)
-    } finally {
-      setIsSuggesting(false)
-    }
-  }
 
   useEffect(() => {
     if (editing) {
@@ -176,20 +154,7 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="description">Note <span className="text-muted-foreground font-normal">(optional)</span></Label>
-            <div className="flex gap-2">
-              <Input id="description" placeholder="e.g. Monthly rent" {...register('description')} />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={suggestCategory}
-                disabled={isSuggesting || !description?.trim()}
-                aria-label="Suggest category"
-                title="Suggest category"
-              >
-                <Sparkles className={`h-4 w-4 ${isSuggesting ? 'animate-pulse' : ''}`} />
-              </Button>
-            </div>
+            <Input id="description" placeholder="e.g. Monthly rent" {...register('description')} />
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer select-none">
