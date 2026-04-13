@@ -72,7 +72,32 @@ export function LoginForm() {
         <p className="text-sm text-destructive">{serverError}</p>
       )}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="login-btn w-full"
+        style={{
+          background: 'linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)',
+          border: 'none',
+          height: '44px',
+          fontSize: '15px',
+          fontWeight: 600,
+          boxShadow: '0 5px 0px #5b21b6, 0 10px 25px rgba(124, 58, 237, 0.35)',
+          transition: 'transform 0.1s ease, box-shadow 0.1s ease',
+        }}
+        onMouseDown={(e) => {
+          e.currentTarget.style.transform = 'translateY(4px)'
+          e.currentTarget.style.boxShadow = '0 1px 0px #5b21b6, 0 4px 12px rgba(124, 58, 237, 0.25)'
+        }}
+        onMouseUp={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.boxShadow = '0 5px 0px #5b21b6, 0 10px 25px rgba(124, 58, 237, 0.35)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.boxShadow = '0 5px 0px #5b21b6, 0 10px 25px rgba(124, 58, 237, 0.35)'
+        }}
+      >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
 
