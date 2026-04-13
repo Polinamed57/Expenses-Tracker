@@ -11,6 +11,8 @@ import type { ChartType } from '@/components/charts/ChartToggle'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useMonthlyIncome, useSetMonthlyIncome } from '@/hooks/useMonthlyIncome'
 import { useSeedRecurringExpenses } from '@/hooks/useExpenses'
+import { useProfile } from '@/hooks/useProfile'
+import { useAuth } from '@/providers/AuthProvider'
 import { QuickAddExpense } from '@/components/expenses/QuickAddExpense'
 import { HistoryChart } from '@/components/charts/HistoryChart'
 import {
@@ -78,6 +80,15 @@ export default function Dashboard() {
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
 
+  const { session } = useAuth()
+  const { data: profile } = useProfile()
+
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const firstName = profile?.display_name
+    ? profile.display_name.split(' ')[0]
+    : session?.user.email?.split('@')[0] ?? ''
+
   useSeedRecurringExpenses(year, month)
   const { totals } = useMonthlyTotals({ year, month })
   const { data: income } = useMonthlyIncome(year, month)
@@ -111,7 +122,12 @@ export default function Dashboard() {
     <PageShell>
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <div>
+            <h1 className="text-2xl font-semibold">👋 {greeting}, {firstName}</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
 
