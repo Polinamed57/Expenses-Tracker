@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil } from 'lucide-react'
+import { Pencil, CreditCard, TrendingUp, Target, AlertTriangle } from 'lucide-react'
 import { PageShell } from '@/components/layout/PageShell'
 import { MonthPicker } from '@/components/common/MonthPicker'
 import { CategoryList } from '@/components/categories/CategoryList'
@@ -28,11 +28,29 @@ interface StatCardProps {
   value: string
   alert?: boolean
   onEdit?: () => void
+  icon: React.ReactNode
+  iconBg: string
+  iconColor: string
 }
 
-function StatCard({ label, value, alert, onEdit }: StatCardProps) {
+function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor }: StatCardProps) {
   return (
-    <div className="card-hover rounded-lg border border-border bg-card px-3 py-3 sm:px-4">
+    <div className="card-hover rounded-xl border border-border bg-card px-4 py-4">
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '36px',
+          height: '36px',
+          borderRadius: '10px',
+          background: iconBg,
+          color: iconColor,
+          marginBottom: '12px',
+        }}
+      >
+        {icon}
+      </div>
       <div className="flex items-center justify-between gap-1">
         <p className="text-xs text-muted-foreground truncate">{label}</p>
         {onEdit && (
@@ -45,7 +63,7 @@ function StatCard({ label, value, alert, onEdit }: StatCardProps) {
           </button>
         )}
       </div>
-      <p className={`mt-1 text-lg font-bold tabular-nums sm:text-xl ${alert ? 'text-destructive' : ''}`}>
+      <p className={`mt-1 text-xl font-bold tabular-nums ${alert ? 'text-destructive' : ''}`}>
         {value}
       </p>
     </div>
@@ -100,21 +118,36 @@ export default function Dashboard() {
         <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard label="Total spent" value={`$${totalSpent.toFixed(2)}`} />
+          <StatCard
+            label="Total spent"
+            value={`$${totalSpent.toFixed(2)}`}
+            icon={<CreditCard size={18} />}
+            iconBg="rgba(249,115,22,0.12)"
+            iconColor="#f97316"
+          />
           <StatCard
             label="Total income"
             value={income != null ? `$${income.toFixed(2)}` : '—'}
             onEdit={openIncomeDialog}
+            icon={<TrendingUp size={18} />}
+            iconBg="rgba(34,197,94,0.12)"
+            iconColor="#22c55e"
           />
           <StatCard
             label="Remaining"
             value={totalLimit > 0 ? `$${remaining.toFixed(2)}` : '—'}
             alert={remaining < 0}
+            icon={<Target size={18} />}
+            iconBg={remaining < 0 ? 'rgba(239,68,68,0.12)' : 'rgba(139,92,246,0.12)'}
+            iconColor={remaining < 0 ? '#ef4444' : '#8b5cf6'}
           />
           <StatCard
             label="Over budget"
             value={overBudgetCount === 0 ? 'None' : `${overBudgetCount}`}
             alert={overBudgetCount > 0}
+            icon={<AlertTriangle size={18} />}
+            iconBg={overBudgetCount > 0 ? 'rgba(239,68,68,0.12)' : 'rgba(150,150,150,0.1)'}
+            iconColor={overBudgetCount > 0 ? '#ef4444' : '#9ca3af'}
           />
         </div>
 
