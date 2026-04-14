@@ -133,6 +133,7 @@ export default function Dashboard() {
 
         <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
 
+        <p className="text-sm font-medium text-muted-foreground -mb-5">This month</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard
             label="Total spent"

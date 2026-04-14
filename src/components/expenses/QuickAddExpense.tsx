@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Sparkles } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -83,6 +84,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
       is_recurring: false,
     })
 
+    toast.success('Expense added')
     setDescription('')
     setAmount('')
     setCategoryId('')
@@ -93,14 +95,35 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
-        padding: '12px 16px',
-        borderRadius: '12px',
-        border: '1px solid var(--border)',
-        background: 'var(--card)',
-        maxWidth: '680px',
+        gap: '10px',
+        padding: '14px 16px',
+        borderRadius: '14px',
+        border: '1px solid rgba(139,92,246,0.3)',
+        background: 'rgba(139,92,246,0.04)',
       }}
     >
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+        <Sparkles size={14} style={{ color: '#a855f7', flexShrink: 0 }} />
+        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--foreground)' }}>
+          Quick Add
+        </span>
+        <span
+          style={{
+            fontSize: '10px',
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            color: '#a855f7',
+            background: 'rgba(168,85,247,0.12)',
+            border: '1px solid rgba(168,85,247,0.25)',
+            borderRadius: '4px',
+            padding: '1px 6px',
+          }}
+        >
+          AI
+        </span>
+      </div>
+
       {/* Description with sparkles prefix */}
       <div style={{ position: 'relative', width: '100%' }}>
         <Sparkles
@@ -116,7 +139,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
           }}
         />
         <Input
-          placeholder="e.g. Starbucks"
+          placeholder="e.g. Starbucks 12.50"
           value={description}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}

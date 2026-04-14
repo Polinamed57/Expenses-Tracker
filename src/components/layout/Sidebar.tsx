@@ -1,8 +1,9 @@
-import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Settings, TrendingUp, User, Moon, Sun, Menu, ChevronRight, ChevronLeft, X, Target } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Settings, TrendingUp, User, Moon, Sun, Menu, ChevronRight, ChevronLeft, X, Target, LogOut } from 'lucide-react'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useProfile } from '@/hooks/useProfile'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase'
 
 interface SidebarProps {
   isOpen: boolean
@@ -70,7 +71,13 @@ function NavItems({ isOpen, onClose }: { isOpen: boolean; onClose?: () => void }
 export function Sidebar({ isOpen, onToggle, isMobile }: SidebarProps) {
   const { data: profile } = useProfile()
   const { theme } = useTheme()
+  const navigate = useNavigate()
   const initial = profile?.display_name?.[0]?.toUpperCase() ?? '?'
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    navigate('/login')
+  }
 
   if (isMobile) {
     return (
@@ -236,10 +243,32 @@ export function Sidebar({ isOpen, onToggle, isMobile }: SidebarProps) {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                flex: 1,
               }}
             >
               {profile?.display_name ?? 'You'}
             </span>
+            <button
+              onClick={handleLogout}
+              aria-label="Sign out"
+              title="Sign out"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                color: 'var(--sidebar-foreground)',
+                opacity: 0.6,
+                flexShrink: 0,
+              }}
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         </aside>
       </>
@@ -380,7 +409,7 @@ export function Sidebar({ isOpen, onToggle, isMobile }: SidebarProps) {
           borderTop: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: isOpen ? 'flex-start' : 'center',
           overflow: 'hidden',
           gap: '8px',
         }}
@@ -403,18 +432,42 @@ export function Sidebar({ isOpen, onToggle, isMobile }: SidebarProps) {
           {initial}
         </div>
         {isOpen && (
-          <span
-            style={{
-              fontSize: '13px',
-              fontWeight: 500,
-              color: 'var(--sidebar-foreground)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {profile?.display_name ?? 'You'}
-          </span>
+          <>
+            <span
+              style={{
+                fontSize: '13px',
+                fontWeight: 500,
+                color: 'var(--sidebar-foreground)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1,
+              }}
+            >
+              {profile?.display_name ?? 'You'}
+            </span>
+            <button
+              onClick={handleLogout}
+              aria-label="Sign out"
+              title="Sign out"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                color: 'var(--sidebar-foreground)',
+                opacity: 0.6,
+                flexShrink: 0,
+              }}
+            >
+              <LogOut size={14} />
+            </button>
+          </>
         )}
       </div>
     </aside>
