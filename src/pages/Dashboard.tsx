@@ -98,8 +98,7 @@ export default function Dashboard() {
   const overBudgetCount = totals.filter(
     (t) => t.budget_limit !== null && t.total > t.budget_limit,
   ).length
-  const totalLimit = totals.reduce((sum, t) => sum + (t.budget_limit ?? 0), 0)
-  const remaining = totalLimit - totalSpent
+  const remaining = income != null ? income - totalSpent : null
 
   function handleMonthChange(y: number, m: number) {
     setYear(y)
@@ -152,11 +151,11 @@ export default function Dashboard() {
           />
           <StatCard
             label="Remaining"
-            value={totalLimit > 0 ? `$${remaining.toFixed(2)}` : '—'}
-            alert={remaining < 0}
+            value={remaining !== null ? `$${remaining.toFixed(2)}` : '—'}
+            alert={remaining !== null && remaining < 0}
             icon={<Target size={18} />}
-            iconBg={remaining < 0 ? 'rgba(239,68,68,0.12)' : 'rgba(139,92,246,0.12)'}
-            iconColor={remaining < 0 ? '#ef4444' : '#8b5cf6'}
+            iconBg={remaining !== null && remaining < 0 ? 'rgba(239,68,68,0.12)' : 'rgba(139,92,246,0.12)'}
+            iconColor={remaining !== null && remaining < 0 ? '#ef4444' : '#8b5cf6'}
           />
           <StatCard
             label="Over budget"
@@ -168,33 +167,6 @@ export default function Dashboard() {
           />
         </div>
 
-        {totalLimit > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Overall budget</span>
-              <span className="font-medium tabular-nums">
-                ${totalSpent.toFixed(0)}
-                <span className="text-muted-foreground font-normal"> / ${totalLimit.toFixed(0)}</span>
-              </span>
-            </div>
-            <div style={{ height: '8px', borderRadius: '9999px', backgroundColor: 'rgba(150,150,150,0.2)' }}>
-              <div
-                style={{
-                  height: '8px',
-                  width: `${Math.min((totalSpent / totalLimit) * 100, 100)}%`,
-                  borderRadius: '9999px',
-                  background: totalSpent > totalLimit
-                    ? 'linear-gradient(to right, #ff4444, #ff0000)'
-                    : 'linear-gradient(to right, #4ade80, #facc15, #f97316, #ef4444)',
-                  backgroundSize: totalSpent <= totalLimit
-                    ? `${(10000 / Math.min((totalSpent / totalLimit) * 100, 100)).toFixed(1)}% 100%`
-                    : undefined,
-                  transition: 'width 0.5s ease',
-                }}
-              />
-            </div>
-          </div>
-        )}
 
         <CategoryList totals={totals} />
 
