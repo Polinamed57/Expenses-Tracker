@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { AddCategoryDialog } from './AddCategoryDialog'
+import { CategorySheet } from './CategorySheet'
 import type { Category, MonthlyTotal } from '@/types/index'
 
 interface CategoryCardProps {
   category: Category
   total?: MonthlyTotal
+  year: number
+  month: number
 }
 
-export function CategoryCard({ category, total }: CategoryCardProps) {
-  const [editOpen, setEditOpen] = useState(false)
+export function CategoryCard({ category, total, year, month }: CategoryCardProps) {
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   const spent = total?.total ?? 0
   const limit = category.budget_limit
@@ -24,7 +26,7 @@ export function CategoryCard({ category, total }: CategoryCardProps) {
   return (
     <>
       <button
-        onClick={() => setEditOpen(true)}
+        onClick={() => setSheetOpen(true)}
         className="card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ padding: '12px' }}
       >
@@ -78,7 +80,14 @@ export function CategoryCard({ category, total }: CategoryCardProps) {
         )}
       </button>
 
-      <AddCategoryDialog open={editOpen} onOpenChange={setEditOpen} editing={category} />
+      <CategorySheet
+        category={category}
+        total={total}
+        year={year}
+        month={month}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+      />
     </>
   )
 }

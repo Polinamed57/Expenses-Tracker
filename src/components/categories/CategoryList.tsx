@@ -7,6 +7,8 @@ import type { MonthlyTotal } from '@/types/index'
 
 interface CategoryListProps {
   totals: MonthlyTotal[]
+  year: number
+  month: number
 }
 
 function CategorySkeleton() {
@@ -21,7 +23,7 @@ function CategorySkeleton() {
   )
 }
 
-export function CategoryList({ totals }: CategoryListProps) {
+export function CategoryList({ totals, year, month }: CategoryListProps) {
   const [addOpen, setAddOpen] = useState(false)
   const { data: categories = [], isLoading } = useCategories()
 
@@ -54,6 +56,8 @@ export function CategoryList({ totals }: CategoryListProps) {
               key={cat.id}
               category={cat}
               total={totalsByCategory[cat.id]}
+              year={year}
+              month={month}
             />
           ))}
           <button
