@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Pencil, Trash2, X } from 'lucide-react'
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -65,20 +65,18 @@ export function CategorySheet({ category, total, year, month, open, onOpenChange
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="right" className="sm:max-w-[440px] overflow-y-auto">
+        <SheetContent side="right" className="sm:max-w-[440px] overflow-y-auto" showCloseButton={false}>
 
-          <SheetHeader className="flex-row items-center justify-between gap-3 pb-0">
-            <div className="flex items-center gap-3">
-              {category.icon ? (
-                <span style={{ fontSize: '22px', lineHeight: 1 }}>{category.icon}</span>
-              ) : (
-                <span style={{
-                  width: '12px', height: '12px', borderRadius: '50%',
-                  background: category.color, flexShrink: 0, display: 'inline-block',
-                }} />
-              )}
-              <SheetTitle>{category.name}</SheetTitle>
-            </div>
+          <SheetHeader className="flex-row items-center gap-3 pb-0 pr-4">
+            {category.icon ? (
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>{category.icon}</span>
+            ) : (
+              <span style={{
+                width: '12px', height: '12px', borderRadius: '50%',
+                background: category.color, flexShrink: 0, display: 'inline-block',
+              }} />
+            )}
+            <SheetTitle className="flex-1">{category.name}</SheetTitle>
             <button
               onClick={() => setEditOpen(true)}
               className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
@@ -86,6 +84,9 @@ export function CategorySheet({ category, total, year, month, open, onOpenChange
             >
               <Pencil size={14} />
             </button>
+            <SheetClose className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+              <X size={14} />
+            </SheetClose>
           </SheetHeader>
 
           <div className="flex flex-col gap-6 p-4 pt-3">
