@@ -14,6 +14,7 @@ export interface Category {
   icon: string | null
   budget_limit: number | null
   sort_order: number
+  is_pinned: boolean
   is_archived: boolean
   created_at: string
   updated_at: string
