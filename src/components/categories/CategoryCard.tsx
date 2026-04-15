@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Pin } from 'lucide-react'
 import { CategorySheet } from './CategorySheet'
+import { useTogglePinCategory } from '@/hooks/useCategories'
 import type { Category, MonthlyTotal } from '@/types/index'
 
 interface CategoryCardProps {
@@ -11,6 +13,7 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category, total, year, month }: CategoryCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const togglePin = useTogglePinCategory()
 
   const spent = total?.total ?? 0
   const limit = category.budget_limit
@@ -27,9 +30,25 @@ export function CategoryCard({ category, total, year, month }: CategoryCardProps
     <>
       <button
         onClick={() => setSheetOpen(true)}
-        className="card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="relative card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ padding: '12px' }}
       >
+        {/* Pin button — visible on hover, always visible when pinned */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            togglePin.mutate({ id: category.id, is_pinned: !category.is_pinned })
+          }}
+          className={`absolute top-2 right-2 rounded p-0.5 transition-all ${
+            category.is_pinned
+              ? 'opacity-100 text-violet-500'
+              : 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-violet-500'
+          }`}
+          aria-label={category.is_pinned ? 'Unpin' : 'Pin'}
+        >
+          <Pin size={12} className={category.is_pinned ? 'fill-current' : ''} />
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {category.icon ? (
             <span style={{ fontSize: '16px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>

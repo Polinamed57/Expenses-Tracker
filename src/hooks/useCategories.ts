@@ -16,6 +16,7 @@ export function useCategories() {
         .from('categories')
         .select('*')
         .eq('is_archived', false)
+        .order('is_pinned', { ascending: false })
         .order('sort_order')
 
       if (error) throw error
@@ -133,6 +134,23 @@ export function useCategoryHasExpenses(categoryId: string) {
       return (count ?? 0) > 0
     },
     enabled: !!session && !!categoryId,
+  })
+}
+
+export function useTogglePinCategory() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, is_pinned }: { id: string; is_pinned: boolean }) => {
+      const { error } = await supabase
+        .from('categories')
+        .update({ is_pinned, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
   })
 }
 
