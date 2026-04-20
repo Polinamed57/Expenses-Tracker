@@ -79,6 +79,12 @@ export default function Dashboard() {
   const [chartType, setChartType] = useState<ChartType>('pie')
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
+  const [highlightCategoryId, setHighlightCategoryId] = useState<string | null>(null)
+
+  function handleExpenseAdded(categoryId: string) {
+    setHighlightCategoryId(categoryId)
+    setTimeout(() => setHighlightCategoryId(null), 1200)
+  }
 
   const { session } = useAuth()
   const { data: profile } = useProfile()
@@ -130,7 +136,10 @@ export default function Dashboard() {
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
 
-        <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
+        <QuickAddExpense
+          defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`}
+          onExpenseAdded={handleExpenseAdded}
+        />
 
         <p className="text-sm font-medium text-muted-foreground -mb-5">This month</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -168,7 +177,7 @@ export default function Dashboard() {
         </div>
 
 
-        <CategoryList totals={totals} year={year} month={month} />
+        <CategoryList totals={totals} year={year} month={month} highlightCategoryId={highlightCategoryId} />
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">

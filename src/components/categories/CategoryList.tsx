@@ -9,6 +9,7 @@ interface CategoryListProps {
   totals: MonthlyTotal[]
   year: number
   month: number
+  highlightCategoryId?: string | null
 }
 
 function CategorySkeleton() {
@@ -23,7 +24,7 @@ function CategorySkeleton() {
   )
 }
 
-export function CategoryList({ totals, year, month }: CategoryListProps) {
+export function CategoryList({ totals, year, month, highlightCategoryId }: CategoryListProps) {
   const [addOpen, setAddOpen] = useState(false)
   const { data: categories = [], isLoading } = useCategories()
 
@@ -58,6 +59,7 @@ export function CategoryList({ totals, year, month }: CategoryListProps) {
               total={totalsByCategory[cat.id]}
               year={year}
               month={month}
+              isHighlighted={cat.id === highlightCategoryId}
             />
           ))}
           <button

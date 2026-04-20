@@ -9,9 +9,10 @@ interface CategoryCardProps {
   total?: MonthlyTotal
   year: number
   month: number
+  isHighlighted?: boolean
 }
 
-export function CategoryCard({ category, total, year, month }: CategoryCardProps) {
+export function CategoryCard({ category, total, year, month, isHighlighted }: CategoryCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const togglePin = useTogglePinCategory()
 
@@ -30,7 +31,7 @@ export function CategoryCard({ category, total, year, month }: CategoryCardProps
     <>
       <button
         onClick={() => setSheetOpen(true)}
-        className="relative card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className={`relative card-hover group flex aspect-square w-full flex-col rounded-xl border border-border bg-card text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isHighlighted ? 'card-shimmer' : ''}`}
         style={{ padding: '12px' }}
       >
         {/* Pin button — visible on hover, always visible when pinned */}

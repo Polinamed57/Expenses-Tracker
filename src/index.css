@@ -136,6 +136,30 @@
   }
 }
 
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-150%) skewX(-15deg); }
+  100% { transform: translateX(250%) skewX(-15deg); }
+}
+
+.card-shimmer {
+  overflow: hidden;
+}
+
+.card-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 60%
+  );
+  animation: shimmer-sweep 0.9s ease forwards;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
 @keyframes highlight-new {
   0% { background: rgba(99, 102, 241, 0.15); }
   100% { background: transparent; }

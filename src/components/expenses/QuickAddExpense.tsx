@@ -14,9 +14,10 @@ import { useAddExpense } from '@/hooks/useExpenses'
 
 interface QuickAddExpenseProps {
   defaultDate: string
+  onExpenseAdded?: (categoryId: string) => void
 }
 
-export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
+export function QuickAddExpense({ defaultDate, onExpenseAdded }: QuickAddExpenseProps) {
   const { data: categories = [] } = useCategories()
   const addExpense = useAddExpense()
 
@@ -85,6 +86,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
     })
 
     toast.success('Expense added')
+    onExpenseAdded?.(categoryId)
     setDescription('')
     setAmount('')
     setCategoryId('')
