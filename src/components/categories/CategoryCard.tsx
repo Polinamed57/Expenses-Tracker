@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Pin } from 'lucide-react'
 import { CategorySheet } from './CategorySheet'
 import { useTogglePinCategory } from '@/hooks/useCategories'
@@ -12,11 +12,42 @@ interface CategoryCardProps {
   isHighlighted?: boolean
 }
 
+function useCountUp(target: number, duration = 600) {
+  const [display, setDisplay] = useState(target)
+  const prevRef = useRef(target)
+
+  useEffect(() => {
+    const start = prevRef.current
+    const diff = target - start
+    if (diff === 0) return
+
+    const startTime = performance.now()
+
+    function tick(now: number) {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(start + diff * eased)
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      } else {
+        prevRef.current = target
+        setDisplay(target)
+      }
+    }
+
+    requestAnimationFrame(tick)
+  }, [target, duration])
+
+  return display
+}
+
 export function CategoryCard({ category, total, year, month, isHighlighted }: CategoryCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const togglePin = useTogglePinCategory()
 
   const spent = total?.total ?? 0
+  const animatedSpent = useCountUp(spent)
   const limit = category.budget_limit
   const progress = limit ? Math.min((spent / limit) * 100, 100) : null
   const percentage = limit ? Math.round((spent / limit) * 100) : null
@@ -73,7 +104,7 @@ export function CategoryCard({ category, total, year, month, isHighlighted }: Ca
             className={isOverBudget ? 'text-destructive' : ''}
             style={{ fontSize: '26px', fontWeight: 800, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}
           >
-            ${spent.toFixed(0)}
+            ${animatedSpent.toFixed(0)}
           </p>
         </div>
 
