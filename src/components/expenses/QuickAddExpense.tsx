@@ -98,13 +98,13 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
         gap: '10px',
         padding: '14px 16px',
         borderRadius: '14px',
-        border: '1px solid rgba(139,92,246,0.3)',
-        background: 'rgba(139,92,246,0.04)',
+        border: '1px solid rgba(124,58,237,0.3)',
+        background: 'rgba(124,58,237,0.04)',
       }}
     >
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-        <Sparkles size={14} style={{ color: '#a855f7', flexShrink: 0 }} />
+        <Sparkles size={14} style={{ color: '#7c3aed', flexShrink: 0 }} />
         <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--foreground)' }}>
           Quick Add
         </span>
@@ -113,9 +113,9 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
             fontSize: '10px',
             fontWeight: 600,
             letterSpacing: '0.04em',
-            color: '#a855f7',
-            background: 'rgba(168,85,247,0.12)',
-            border: '1px solid rgba(168,85,247,0.25)',
+            color: '#7c3aed',
+            background: 'rgba(124,58,237,0.12)',
+            border: '1px solid rgba(124,58,237,0.25)',
             borderRadius: '4px',
             padding: '1px 6px',
           }}
@@ -133,7 +133,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
             left: '10px',
             top: '50%',
             transform: 'translateY(-50%)',
-            color: isSuggesting ? '#a855f7' : 'var(--muted-foreground)',
+            color: isSuggesting ? '#7c3aed' : 'var(--muted-foreground)',
             transition: 'color 0.2s ease',
             pointerEvents: 'none',
           }}
@@ -146,7 +146,7 @@ export function QuickAddExpense({ defaultDate }: QuickAddExpenseProps) {
           style={{ paddingLeft: '30px' }}
         />
         {isSuggesting && (
-          <p style={{ fontSize: '11px', color: '#a855f7', marginTop: '4px', paddingLeft: '2px' }}>
+          <p style={{ fontSize: '11px', color: '#7c3aed', marginTop: '4px', paddingLeft: '2px' }}>
             Analyzing...
           </p>
         )}

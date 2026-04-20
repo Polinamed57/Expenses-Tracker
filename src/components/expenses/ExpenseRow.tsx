@@ -16,6 +16,8 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const deleteExpense = useDeleteExpense()
 
+  const isNew = Date.now() - new Date(expense.created_at).getTime() < 4000
+
   const date = new Date(expense.expense_date + 'T00:00:00').toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -23,7 +25,7 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 py-3">
+      <div className={`flex items-center justify-between gap-3 py-3 ${isNew ? 'expense-new' : ''}`}>
         <div className="flex items-center gap-3 min-w-0">
           {category && (
             <span
