@@ -146,11 +146,7 @@ export function CategorySheet({ category, total, year, month, open, onOpenChange
                       <div className="flex items-center gap-3">
                         <p className="text-sm font-semibold tabular-nums">${expense.amount.toFixed(2)}</p>
                         <button
-                          onClick={() => deleteExpense.mutate({
-                            id: expense.id,
-                            category_id: expense.category_id,
-                            expense_date: expense.expense_date,
-                          })}
+                          onClick={() => deleteExpense.mutate(expense)}
                           className="text-muted-foreground hover:text-destructive transition-colors"
                           aria-label="Delete expense"
                         >

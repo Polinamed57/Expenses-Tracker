@@ -138,16 +138,38 @@ export function useDeleteExpense() {
   const { session } = useAuth()
 
   return useMutation({
-    mutationFn: async (expense: Pick<Expense, 'id' | 'category_id' | 'expense_date'>) => {
+    mutationFn: async (expense: Expense) => {
       const { error } = await supabase.from('expenses').delete().eq('id', expense.id)
       if (error) throw error
       return expense
     },
     onSuccess: (expense) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
-      toast.success('Expense deleted')
       const d = new Date(expense.expense_date)
       upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+
+      toast.success('Expense deleted', {
+        action: {
+          label: 'Undo',
+          onClick: async () => {
+            const { error } = await supabase.from('expenses').insert({
+              user_id: session!.user.id,
+              category_id: expense.category_id,
+              amount: expense.amount,
+              description: expense.description,
+              expense_date: expense.expense_date,
+              is_recurring: expense.is_recurring,
+            })
+            if (error) {
+              toast.error('Could not restore expense')
+              return
+            }
+            queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+            upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+            toast.success('Expense restored')
+          },
+        },
+      })
     },
     onError: () => toast.error('Failed to delete expense'),
   })

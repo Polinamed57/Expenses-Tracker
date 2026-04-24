@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Pencil, Trash2, Repeat2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { AddExpenseDialog } from './AddExpenseDialog'
 import { useDeleteExpense } from '@/hooks/useExpenses'
 import type { Expense, Category } from '@/types/index'
@@ -13,10 +12,7 @@ interface ExpenseRowProps {
 
 export function ExpenseRow({ expense, category }: ExpenseRowProps) {
   const [editOpen, setEditOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
   const deleteExpense = useDeleteExpense()
-
-  const isNew = Date.now() - new Date(expense.created_at).getTime() < 4000
 
   const date = new Date(expense.expense_date + 'T00:00:00').toLocaleDateString('en-US', {
     month: 'short',
@@ -25,7 +21,7 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
 
   return (
     <>
-      <div className={`flex items-center justify-between gap-3 py-3 ${isNew ? 'expense-new' : ''}`}>
+      <div className="flex items-center justify-between gap-3 py-3">
         <div className="flex items-center gap-3 min-w-0">
           {category && (
             <span
@@ -56,21 +52,19 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditOpen(true)}>
             <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => deleteExpense.mutate(expense)}
+            disabled={deleteExpense.isPending}
+          >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       <AddExpenseDialog open={editOpen} onOpenChange={setEditOpen} editing={expense} />
-      <ConfirmDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        title="Delete expense"
-        description="This action cannot be undone."
-        onConfirm={() => deleteExpense.mutate({ id: expense.id, category_id: expense.category_id, expense_date: expense.expense_date })}
-        isLoading={deleteExpense.isPending}
-      />
     </>
   )
 }
