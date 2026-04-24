@@ -60,12 +60,43 @@ interface StatCardProps {
   iconBg: string
   iconColor: string
   delta?: StatCardDelta
+  emptyAction?: { label: string; onClick: () => void }
 }
 
-function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor, delta }: StatCardProps) {
+function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor, delta, emptyAction }: StatCardProps) {
   const deltaColor =
     delta?.tone === 'good' ? '#22c55e' : delta?.tone === 'bad' ? '#ef4444' : 'var(--muted-foreground)'
   const arrow = delta?.direction === 'up' ? '↑' : delta?.direction === 'down' ? '↓' : ''
+
+  const isEmpty = value === '—'
+  if (isEmpty && emptyAction) {
+    return (
+      <button
+        onClick={emptyAction.onClick}
+        className="card-hover rounded-xl border border-dashed border-border bg-card px-4 py-4 text-left transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            background: iconBg,
+            color: iconColor,
+            marginBottom: '12px',
+          }}
+        >
+          {icon}
+        </div>
+        <p className="text-xs text-muted-foreground truncate">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-primary">
+          {emptyAction.label} →
+        </p>
+      </button>
+    )
+  }
 
   return (
     <div className="card-hover rounded-xl border border-border bg-card px-4 py-4">
@@ -215,6 +246,7 @@ export default function Dashboard() {
             iconBg="rgba(34,197,94,0.12)"
             iconColor="#22c55e"
             delta={incomeDelta}
+            emptyAction={{ label: 'Set income', onClick: openIncomeDialog }}
           />
           <StatCard
             label="Remaining"
