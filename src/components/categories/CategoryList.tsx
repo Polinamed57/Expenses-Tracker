@@ -9,7 +9,6 @@ interface CategoryListProps {
   totals: MonthlyTotal[]
   year: number
   month: number
-  highlightCategoryId?: string | null
 }
 
 function CategorySkeleton() {
@@ -24,7 +23,7 @@ function CategorySkeleton() {
   )
 }
 
-export function CategoryList({ totals, year, month, highlightCategoryId }: CategoryListProps) {
+export function CategoryList({ totals, year, month }: CategoryListProps) {
   const [addOpen, setAddOpen] = useState(false)
   const { data: categories = [], isLoading } = useCategories()
 
@@ -59,12 +58,11 @@ export function CategoryList({ totals, year, month, highlightCategoryId }: Categ
               total={totalsByCategory[cat.id]}
               year={year}
               month={month}
-              isHighlighted={cat.id === highlightCategoryId}
             />
           ))}
           <button
             onClick={() => setAddOpen(true)}
-            className="flex aspect-square w-full items-center justify-center rounded-xl border-2 border-dashed border-border text-muted-foreground shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="category-card-glow flex aspect-square w-full items-center justify-center rounded-xl border-2 border-dashed border-border text-muted-foreground shadow-sm hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             style={{ backgroundColor: 'var(--card)' }}
             aria-label="Add category"
           >

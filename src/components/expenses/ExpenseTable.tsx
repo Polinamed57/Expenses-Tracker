@@ -133,8 +133,8 @@ export function ExpenseTable({ year, month }: ExpenseTableProps) {
         ) : expenses.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center">
             <Receipt className="h-8 w-8 text-muted-foreground/50" />
-            <p className="text-sm font-medium">No expenses this month</p>
-            <p className="text-xs text-muted-foreground">Add your first expense to get started</p>
+            <p className="text-sm font-medium">No expenses yet</p>
+            <p className="text-xs text-muted-foreground">Use Quick Add above to log your first one</p>
           </div>
         ) : (
           <>
