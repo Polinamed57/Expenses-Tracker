@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Ban } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,23 +20,30 @@ const EMOJI_OPTIONS = [
   '🏠', // rent / housing
   '🚗', // car / transport
   '🚌', // public transport
+  '✈️', // travel
   '🍕', // food / dining out
+  '🍔', // fast food / takeout
   '🛒', // groceries
   '☕', // coffee
+  '🍷', // drinks / nights out
   '🛍️', // shopping
-  '💊', // health / pharmacy
+  '👕', // clothing
+  '💊', // pharmacy
+  '🏥', // medical / doctor
   '🏋️', // gym / fitness
   '📚', // education
-  '🎮', // entertainment / games
+  '🎮', // games
+  '🎬', // movies / cinema
   '🎵', // music / subscriptions
-  '✈️', // travel
+  '📺', // streaming
+  '💻', // tech / devices
+  '📱', // phone / internet
+  '⚡', // utilities
+  '🔧', // repairs / maintenance
   '🐾', // pets
   '👶', // kids
   '💇', // personal care / beauty
-  '🔧', // repairs / maintenance
-  '📱', // phone / internet
-  '⚡', // utilities (electricity, water)
-  '📺', // subscriptions (Netflix, Spotify etc.)
+  '💰', // savings / cash
   '🎁', // gifts
 ]
 
@@ -136,6 +144,27 @@ export function AddCategoryDialog({ open, onOpenChange, editing }: AddCategoryDi
             <div className="flex flex-col gap-2">
               <Label>Icon <span className="text-muted-foreground font-normal">(optional)</span></Label>
               <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setValue('icon', null)}
+                  title="No icon"
+                  aria-label="No icon"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: iconValue === null ? `2px solid ${colorValue}` : '2px solid transparent',
+                    background: iconValue === null ? `${colorValue}20` : 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    color: 'var(--muted-foreground)',
+                  }}
+                >
+                  <Ban size={16} />
+                </button>
                 {EMOJI_OPTIONS.map((emoji) => (
                   <button
                     key={emoji}
