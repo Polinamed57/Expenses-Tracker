@@ -25,6 +25,32 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 
+type DeltaTone = 'good' | 'bad' | 'neutral'
+
+interface StatCardDelta {
+  text: string
+  tone: DeltaTone
+  direction: 'up' | 'down' | 'same'
+}
+
+interface BuildDeltaOptions {
+  format: (value: number) => string
+  upIsGood: boolean
+  hideWhenBothZero?: boolean
+}
+
+function buildDelta(current: number, previous: number, opts: BuildDeltaOptions): StatCardDelta | undefined {
+  if (opts.hideWhenBothZero && current === 0 && previous === 0) return undefined
+  const diff = current - previous
+  if (diff === 0) {
+    return { text: 'No change', tone: 'neutral', direction: 'same' }
+  }
+  const direction: StatCardDelta['direction'] = diff > 0 ? 'up' : 'down'
+  const tone: DeltaTone =
+    (diff > 0 && opts.upIsGood) || (diff < 0 && !opts.upIsGood) ? 'good' : 'bad'
+  return { text: opts.format(Math.abs(diff)), tone, direction }
+}
+
 interface StatCardProps {
   label: string
   value: string
@@ -33,9 +59,14 @@ interface StatCardProps {
   icon: React.ReactNode
   iconBg: string
   iconColor: string
+  delta?: StatCardDelta
 }
 
-function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor }: StatCardProps) {
+function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor, delta }: StatCardProps) {
+  const deltaColor =
+    delta?.tone === 'good' ? '#22c55e' : delta?.tone === 'bad' ? '#ef4444' : 'var(--muted-foreground)'
+  const arrow = delta?.direction === 'up' ? '↑' : delta?.direction === 'down' ? '↓' : ''
+
   return (
     <div className="card-hover rounded-xl border border-border bg-card px-4 py-4">
       <div
@@ -68,6 +99,11 @@ function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor }: Stat
       <p className={`mt-1 text-xl font-bold tabular-nums ${alert ? 'text-destructive' : ''}`}>
         {value}
       </p>
+      {delta && (
+        <p className="mt-1 text-[11px] tabular-nums" style={{ color: deltaColor }}>
+          {arrow} {delta.text} <span style={{ color: 'var(--muted-foreground)' }}>vs last month</span>
+        </p>
+      )}
     </div>
   )
 }
@@ -79,12 +115,6 @@ export default function Dashboard() {
   const [chartType, setChartType] = useState<ChartType>('pie')
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
-  const [highlightCategoryId, setHighlightCategoryId] = useState<string | null>(null)
-
-  function handleExpenseAdded(categoryId: string) {
-    setHighlightCategoryId(categoryId)
-    setTimeout(() => setHighlightCategoryId(null), 1200)
-  }
 
   const { session } = useAuth()
   const { data: profile } = useProfile()
@@ -100,11 +130,40 @@ export default function Dashboard() {
   const { data: income } = useMonthlyIncome(year, month)
   const setIncome = useSetMonthlyIncome()
 
+  const prevYear = month === 1 ? year - 1 : year
+  const prevMonth = month === 1 ? 12 : month - 1
+  const { totals: prevTotals } = useMonthlyTotals({ year: prevYear, month: prevMonth })
+  const { data: prevIncome } = useMonthlyIncome(prevYear, prevMonth)
+
   const totalSpent = totals.reduce((sum, t) => sum + t.total, 0)
   const overBudgetCount = totals.filter(
     (t) => t.budget_limit !== null && t.total > t.budget_limit,
   ).length
   const remaining = income != null ? income - totalSpent : null
+
+  const prevTotalSpent = prevTotals.reduce((sum, t) => sum + t.total, 0)
+  const prevOverBudgetCount = prevTotals.filter(
+    (t) => t.budget_limit !== null && t.total > t.budget_limit,
+  ).length
+  const prevRemaining = prevIncome != null ? prevIncome - prevTotalSpent : null
+
+  const spentDelta = buildDelta(totalSpent, prevTotalSpent, {
+    format: (n) => `$${n.toFixed(2)}`,
+    upIsGood: false,
+  })
+  const incomeDelta =
+    income != null && prevIncome != null
+      ? buildDelta(income, prevIncome, { format: (n) => `$${n.toFixed(2)}`, upIsGood: true })
+      : undefined
+  const remainingDelta =
+    remaining != null && prevRemaining != null
+      ? buildDelta(remaining, prevRemaining, { format: (n) => `$${n.toFixed(2)}`, upIsGood: true })
+      : undefined
+  const overBudgetDelta = buildDelta(overBudgetCount, prevOverBudgetCount, {
+    format: (n) => String(n),
+    upIsGood: false,
+    hideWhenBothZero: true,
+  })
 
   function handleMonthChange(y: number, m: number) {
     setYear(y)
@@ -136,10 +195,7 @@ export default function Dashboard() {
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
 
-        <QuickAddExpense
-          defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`}
-          onExpenseAdded={handleExpenseAdded}
-        />
+        <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
 
         <p className="text-sm font-medium text-muted-foreground -mb-5">This month</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -149,6 +205,7 @@ export default function Dashboard() {
             icon={<CreditCard size={18} />}
             iconBg="rgba(249,115,22,0.12)"
             iconColor="#f97316"
+            delta={spentDelta}
           />
           <StatCard
             label="Total income"
@@ -157,6 +214,7 @@ export default function Dashboard() {
             icon={<TrendingUp size={18} />}
             iconBg="rgba(34,197,94,0.12)"
             iconColor="#22c55e"
+            delta={incomeDelta}
           />
           <StatCard
             label="Remaining"
@@ -165,6 +223,7 @@ export default function Dashboard() {
             icon={<Target size={18} />}
             iconBg={remaining !== null && remaining < 0 ? 'rgba(239,68,68,0.12)' : 'rgba(139,92,246,0.12)'}
             iconColor={remaining !== null && remaining < 0 ? '#ef4444' : '#8b5cf6'}
+            delta={remainingDelta}
           />
           <StatCard
             label="Over budget"
@@ -173,11 +232,12 @@ export default function Dashboard() {
             icon={<AlertTriangle size={18} />}
             iconBg={overBudgetCount > 0 ? 'rgba(239,68,68,0.12)' : 'rgba(150,150,150,0.1)'}
             iconColor={overBudgetCount > 0 ? '#ef4444' : '#9ca3af'}
+            delta={overBudgetDelta}
           />
         </div>
 
 
-        <CategoryList totals={totals} year={year} month={month} highlightCategoryId={highlightCategoryId} />
+        <CategoryList totals={totals} year={year} month={month} />
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
