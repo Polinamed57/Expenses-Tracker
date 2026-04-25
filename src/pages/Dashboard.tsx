@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, CreditCard, TrendingUp, Target, AlertTriangle } from 'lucide-react'
+import { Pencil, CreditCard, TrendingUp, Target, AlertTriangle, Plus, Receipt } from 'lucide-react'
 import { PageShell } from '@/components/layout/PageShell'
 import { MonthPicker } from '@/components/common/MonthPicker'
 import { CategoryList } from '@/components/categories/CategoryList'
@@ -10,10 +10,12 @@ import { ChartToggle } from '@/components/charts/ChartToggle'
 import type { ChartType } from '@/components/charts/ChartToggle'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useMonthlyIncome, useSetMonthlyIncome } from '@/hooks/useMonthlyIncome'
-import { useSeedRecurringExpenses } from '@/hooks/useExpenses'
+import { useExpenses, useSeedRecurringExpenses } from '@/hooks/useExpenses'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/providers/AuthProvider'
 import { QuickAddExpense } from '@/components/expenses/QuickAddExpense'
+import { AddOneTimeDialog } from '@/components/expenses/AddOneTimeDialog'
+import { OneTimeList } from '@/components/expenses/OneTimeList'
 import { HistoryChart } from '@/components/charts/HistoryChart'
 import {
   Dialog,
@@ -146,6 +148,7 @@ export default function Dashboard() {
   const [chartType, setChartType] = useState<ChartType>('pie')
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
+  const [oneTimeOpen, setOneTimeOpen] = useState(false)
 
   const { session } = useAuth()
   const { data: profile } = useProfile()
@@ -158,21 +161,24 @@ export default function Dashboard() {
 
   useSeedRecurringExpenses(year, month)
   const { totals } = useMonthlyTotals({ year, month })
+  const { data: expenses = [] } = useExpenses({ year, month })
   const { data: income } = useMonthlyIncome(year, month)
   const setIncome = useSetMonthlyIncome()
 
   const prevYear = month === 1 ? year - 1 : year
   const prevMonth = month === 1 ? 12 : month - 1
   const { totals: prevTotals } = useMonthlyTotals({ year: prevYear, month: prevMonth })
+  const { data: prevExpenses = [] } = useExpenses({ year: prevYear, month: prevMonth })
   const { data: prevIncome } = useMonthlyIncome(prevYear, prevMonth)
 
-  const totalSpent = totals.reduce((sum, t) => sum + t.total, 0)
+  // include one-time (null category) expenses in totals
+  const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0)
   const overBudgetCount = totals.filter(
     (t) => t.budget_limit !== null && t.total > t.budget_limit,
   ).length
   const remaining = income != null ? income - totalSpent : null
 
-  const prevTotalSpent = prevTotals.reduce((sum, t) => sum + t.total, 0)
+  const prevTotalSpent = prevExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
   const prevOverBudgetCount = prevTotals.filter(
     (t) => t.budget_limit !== null && t.total > t.budget_limit,
   ).length
@@ -226,7 +232,39 @@ export default function Dashboard() {
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
 
-        <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
+        <div className="flex flex-col gap-6">
+          <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
+          <button
+            onClick={() => setOneTimeOpen(true)}
+            className="group flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-4 py-3 text-left transition-colors hover:border-amber-500/60 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                background: 'rgba(245,158,11,0.12)',
+                color: '#f59e0b',
+                flexShrink: 0,
+              }}
+            >
+              <Receipt size={18} />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">One-time expense</p>
+              <p className="text-xs text-muted-foreground">
+                For purchases that don't fit any category
+              </p>
+            </div>
+            <Plus
+              size={16}
+              className="text-muted-foreground transition-colors group-hover:text-amber-500"
+            />
+          </button>
+        </div>
 
         <p className="text-sm font-medium text-muted-foreground -mb-5">This month</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -271,6 +309,8 @@ export default function Dashboard() {
 
         <CategoryList totals={totals} year={year} month={month} />
 
+        <OneTimeList year={year} month={month} />
+
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Spending breakdown</h2>
@@ -289,6 +329,12 @@ export default function Dashboard() {
 
         <ExpenseTable year={year} month={month} />
       </div>
+
+      <AddOneTimeDialog
+        open={oneTimeOpen}
+        onOpenChange={setOneTimeOpen}
+        defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`}
+      />
 
       <Dialog open={incomeDialogOpen} onOpenChange={setIncomeDialogOpen}>
         <DialogContent className="sm:max-w-[320px]">

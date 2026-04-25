@@ -11,7 +11,7 @@ export interface MonthPoint {
   month: number
 }
 
-export function useExpenseHistory(months: number) {
+export function useExpenseHistory(months: number, categoryId?: string) {
   const { session } = useAuth()
 
   const now = new Date()
@@ -20,14 +20,17 @@ export function useExpenseHistory(months: number) {
   const toStr = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
 
   const { data: expenses = [], isLoading } = useQuery({
-    queryKey: ['expense-history', session?.user.id, months],
+    queryKey: ['expense-history', session?.user.id, months, categoryId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('expenses')
         .select('amount, expense_date')
         .gte('expense_date', fromStr)
         .lte('expense_date', toStr)
 
+      if (categoryId) query = query.eq('category_id', categoryId)
+
+      const { data, error } = await query
       if (error) throw error
       return data as Pick<Expense, 'amount' | 'expense_date'>[]
     },

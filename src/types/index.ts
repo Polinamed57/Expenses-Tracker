@@ -23,7 +23,7 @@ export interface Category {
 export interface Expense {
   id: string
   user_id: string
-  category_id: string
+  category_id: string | null
   amount: number
   description: string | null
   expense_date: string

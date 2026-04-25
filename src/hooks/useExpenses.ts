@@ -51,8 +51,10 @@ export function useAddExpense() {
     onSuccess: (values) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
       toast.success('Expense added')
-      const d = new Date(values.expense_date)
-      upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
+      if (values.category_id) {
+        const d = new Date(values.expense_date)
+        upsertSnapshot(session!.user.id, values.category_id, d.getFullYear(), d.getMonth() + 1)
+      }
     },
     onError: () => toast.error('Failed to add expense'),
   })
@@ -146,7 +148,9 @@ export function useDeleteExpense() {
     onSuccess: (expense) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
       const d = new Date(expense.expense_date)
-      upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+      if (expense.category_id) {
+        upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+      }
 
       toast.success('Expense deleted', {
         action: {
@@ -165,7 +169,9 @@ export function useDeleteExpense() {
               return
             }
             queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
-            upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+            if (expense.category_id) {
+              upsertSnapshot(session!.user.id, expense.category_id, d.getFullYear(), d.getMonth() + 1)
+            }
             toast.success('Expense restored')
           },
         },

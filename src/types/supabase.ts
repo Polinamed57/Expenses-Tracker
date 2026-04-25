@@ -65,7 +65,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          category_id: string
+          category_id: string | null
           amount: number
           description: string | null
           expense_date: string
@@ -75,7 +75,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          category_id: string
+          category_id?: string | null
           amount: number
           description?: string | null
           expense_date: string
@@ -83,7 +83,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category_id?: string
+          category_id?: string | null
           amount?: number
           description?: string | null
           expense_date?: string

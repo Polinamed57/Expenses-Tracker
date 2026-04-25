@@ -23,7 +23,7 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
     <>
       <div className="flex items-center justify-between gap-3 py-3">
         <div className="flex items-center gap-3 min-w-0">
-          {category && (
+          {category ? (
             <span
               style={{
                 backgroundColor: category.color,
@@ -34,9 +34,22 @@ export function ExpenseRow({ expense, category }: ExpenseRowProps) {
                 display: 'inline-block',
               }}
             />
+          ) : (
+            <span
+              style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '9999px',
+                border: '1px dashed var(--muted-foreground)',
+                flexShrink: 0,
+                display: 'inline-block',
+              }}
+            />
           )}
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{category?.name ?? 'Unknown'}</p>
+            <p className="truncate text-sm font-medium">
+              {category?.name ?? (expense.category_id == null ? 'One-time' : 'Unknown')}
+            </p>
             {expense.description && (
               <p className="truncate text-xs text-muted-foreground">{expense.description}</p>
             )}
