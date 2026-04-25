@@ -21,7 +21,7 @@ export function OneTimeList({ year, month }: OneTimeListProps) {
     <div className="rounded-xl border border-border bg-card">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-accent/40 transition-colors rounded-xl"
+        className="flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition-colors hover:bg-accent/40 active:bg-amber-500/25"
       >
         <div className="flex items-center gap-3">
           <span

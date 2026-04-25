@@ -236,7 +236,7 @@ export default function Dashboard() {
           <QuickAddExpense defaultDate={`${year}-${String(month).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`} />
           <button
             onClick={() => setOneTimeOpen(true)}
-            className="group flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-4 py-3 text-left transition-colors hover:border-amber-500/60 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="group flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-4 py-3 text-left transition-colors hover:border-amber-500/60 hover:bg-amber-500/5 active:border-amber-500 active:bg-amber-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <span
               style={{

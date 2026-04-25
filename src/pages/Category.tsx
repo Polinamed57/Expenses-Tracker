@@ -11,6 +11,7 @@ import { useCategories, useUpdateCategory } from '@/hooks/useCategories'
 import { useExpenses, useAddExpense, useDeleteExpense } from '@/hooks/useExpenses'
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useExpenseHistory } from '@/hooks/useExpenseHistory'
+import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
 import { AddCategoryDialog } from '@/components/categories/AddCategoryDialog'
 
 interface MiniStatProps {
@@ -70,6 +71,10 @@ export default function Category() {
 
   const { points: history } = useExpenseHistory(6, id)
 
+  // Animated number must be computed before any early return (rules of hooks)
+  const spentForAnimation = totals.find((t) => t.category_id === id)?.total ?? 0
+  const animatedSpent = useAnimatedNumber(spentForAnimation)
+
   const category = categories.find((c) => c.id === id)
 
   useEffect(() => {
@@ -77,6 +82,11 @@ export default function Category() {
       setLimitInput(category.budget_limit != null ? String(category.budget_limit) : '')
     }
   }, [category])
+
+  // Scroll to top when arriving on a category page (browser otherwise carries over dashboard scroll)
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [id])
 
   if (!catsLoading && !category) {
     return <Navigate to="/" replace />
@@ -161,30 +171,34 @@ export default function Category() {
             Back to dashboard
           </Link>
 
-          <div className="flex items-center gap-3">
-            {category.icon ? (
-              <span style={{ fontSize: '32px', lineHeight: 1 }}>{category.icon}</span>
-            ) : (
-              <span
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '9999px',
-                  background: category.color,
-                  flexShrink: 0,
-                  display: 'inline-block',
-                }}
-              />
-            )}
-            <h1 className="text-3xl font-semibold flex-1">{category.name}</h1>
-            <button
-              onClick={() => setEditOpen(true)}
-              className="flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              aria-label="Edit category"
-            >
-              <Pencil size={16} />
-            </button>
-            <MonthPicker year={year} month={month} onChange={handleMonthChange} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              {category.icon ? (
+                <span style={{ fontSize: '32px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
+              ) : (
+                <span
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '9999px',
+                    background: category.color,
+                    flexShrink: 0,
+                    display: 'inline-block',
+                  }}
+                />
+              )}
+              <h1 className="min-w-0 flex-1 truncate text-3xl font-semibold">{category.name}</h1>
+              <button
+                onClick={() => setEditOpen(true)}
+                className="flex shrink-0 items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Edit category"
+              >
+                <Pencil size={16} />
+              </button>
+            </div>
+            <div className="self-end sm:self-auto">
+              <MonthPicker year={year} month={month} onChange={handleMonthChange} />
+            </div>
           </div>
         </div>
 
@@ -193,7 +207,7 @@ export default function Category() {
           <p
             className={`mt-2 text-4xl font-bold tabular-nums ${isOverBudget ? 'text-destructive' : ''}`}
           >
-            ${spent.toFixed(2)}
+            ${animatedSpent.toFixed(2)}
           </p>
           {showDelta && (
             <p className="mt-1 text-xs tabular-nums" style={{ color: deltaColor }}>
@@ -221,6 +235,31 @@ export default function Category() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-semibold">Add expense</p>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="$0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddExpense()}
+              style={{ width: '110px', flexShrink: 0 }}
+            />
+            <Input
+              placeholder="Description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddExpense()}
+            />
+            <Button onClick={handleAddExpense} disabled={addExpense.isPending || !amount}>
+              Add
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
@@ -263,31 +302,6 @@ export default function Category() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-semibold">Add expense</p>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="$0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddExpense()}
-              style={{ width: '110px', flexShrink: 0 }}
-            />
-            <Input
-              placeholder="Description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddExpense()}
-            />
-            <Button onClick={handleAddExpense} disabled={addExpense.isPending || !amount}>
-              Add
-            </Button>
           </div>
         </div>
 
