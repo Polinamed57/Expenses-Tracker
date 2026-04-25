@@ -20,7 +20,7 @@ function exportToCsv(expenses: Expense[], categoryById: Record<string, { name: s
     ['Date', 'Category', 'Amount', 'Description', 'Recurring'],
     ...expenses.map((e) => [
       e.expense_date,
-      categoryById[e.category_id]?.name ?? '',
+      categoryById[e.category_id ?? 'uncategorized']?.name ?? 'Uncategorized',
       e.amount,
       e.description ?? '',
       e.is_recurring ? 'Yes' : 'No',
@@ -62,8 +62,8 @@ export function ExpenseTable({ year, month }: ExpenseTableProps) {
       if (sortField === 'date') cmp = a.expense_date.localeCompare(b.expense_date)
       if (sortField === 'amount') cmp = Number(a.amount) - Number(b.amount)
       if (sortField === 'category') {
-        const ca = categoryById[a.category_id]?.name ?? ''
-        const cb = categoryById[b.category_id]?.name ?? ''
+        const ca = categoryById[a.category_id ?? 'uncategorized']?.name ?? ''
+        const cb = categoryById[b.category_id ?? 'uncategorized']?.name ?? ''
         cmp = ca.localeCompare(cb)
       }
       return sortDir === 'asc' ? cmp : -cmp
@@ -154,8 +154,7 @@ export function ExpenseTable({ year, month }: ExpenseTableProps) {
               {sorted.map((expense) => (
                 <ExpenseRow
                   key={expense.id}
-                  expense={expense}
-                  category={categoryById[expense.category_id]}
+                  expense={expense}category={categoryById[expense.category_id ?? 'uncategorized']}
                 />
               ))}
             </div>

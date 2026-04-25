@@ -62,13 +62,13 @@ export function AddExpenseDialog({ open, onOpenChange, editing, defaultDate }: A
 
   useEffect(() => {
     if (editing) {
-      reset({
-        category_id: editing.category_id,
-        amount: String(editing.amount),
-        description: editing.description ?? '',
-        expense_date: editing.expense_date,
-        is_recurring: editing.is_recurring,
-      })
+    reset({
+      category_id: editing.category_id ?? '',
+      amount: String(editing.amount),
+      description: editing.description ?? '',
+      expense_date: editing.expense_date,
+      is_recurring: editing.is_recurring,
+    })
     } else {
       reset({ category_id: '', amount: '', description: '', expense_date: defaultDate ?? today, is_recurring: false })
     }

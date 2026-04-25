@@ -15,8 +15,10 @@ export function useMonthlyTotals({ year, month }: UseMonthlyTotalsParams) {
   const totals = useMemo<MonthlyTotal[]>(() => {
     const sumByCategory: Record<string, number> = {}
     for (const expense of expenses) {
-      sumByCategory[expense.category_id] =
-        (sumByCategory[expense.category_id] ?? 0) + Number(expense.amount)
+      const key = expense.category_id ?? 'uncategorized'
+
+      sumByCategory[key] =
+        (sumByCategory[key] ?? 0) + Number(expense.amount)
     }
 
     return categories
