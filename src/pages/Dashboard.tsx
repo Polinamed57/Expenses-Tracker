@@ -12,6 +12,7 @@ import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useMonthlyIncome, useSetMonthlyIncome } from '@/hooks/useMonthlyIncome'
 import { useExpenses, useSeedRecurringExpenses } from '@/hooks/useExpenses'
 import { useProfile } from '@/hooks/useProfile'
+import { useSelectedMonth } from '@/hooks/useSelectedMonth'
 import { useAuth } from '@/providers/AuthProvider'
 import { QuickAddExpense } from '@/components/expenses/QuickAddExpense'
 import { AddOneTimeDialog } from '@/components/expenses/AddOneTimeDialog'
@@ -142,9 +143,7 @@ function StatCard({ label, value, alert, onEdit, icon, iconBg, iconColor, delta,
 }
 
 export default function Dashboard() {
-  const now = new Date()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
+  const { year, month, setSelectedMonth } = useSelectedMonth()
   const [chartType, setChartType] = useState<ChartType>('pie')
   const [incomeDialogOpen, setIncomeDialogOpen] = useState(false)
   const [incomeInput, setIncomeInput] = useState('')
@@ -203,8 +202,7 @@ export default function Dashboard() {
   })
 
   function handleMonthChange(y: number, m: number) {
-    setYear(y)
-    setMonth(m)
+    setSelectedMonth(y, m)
   }
 
   function openIncomeDialog() {

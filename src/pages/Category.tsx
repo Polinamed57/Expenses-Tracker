@@ -12,6 +12,7 @@ import { useExpenses, useAddExpense, useDeleteExpense } from '@/hooks/useExpense
 import { useMonthlyTotals } from '@/hooks/useMonthlyTotals'
 import { useExpenseHistory } from '@/hooks/useExpenseHistory'
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
+import { useSelectedMonth } from '@/hooks/useSelectedMonth'
 import { AddCategoryDialog } from '@/components/categories/AddCategoryDialog'
 
 interface MiniStatProps {
@@ -48,11 +49,11 @@ function TrendTooltip({ active, payload }: { active?: boolean; payload?: TrendTo
 export default function Category() {
   const { id } = useParams<{ id: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
-  const now = new Date()
-  const initialYear = Number(searchParams.get('year')) || now.getFullYear()
-  const initialMonth = Number(searchParams.get('month')) || now.getMonth() + 1
-  const [year, setYear] = useState(initialYear)
-  const [month, setMonth] = useState(initialMonth)
+  const urlYear = Number(searchParams.get('year')) || undefined
+  const urlMonth = Number(searchParams.get('month')) || undefined
+  const initial =
+    urlYear && urlMonth ? { year: urlYear, month: urlMonth } : undefined
+  const { year, month, setSelectedMonth } = useSelectedMonth(initial)
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
   const [limitInput, setLimitInput] = useState('')
@@ -154,8 +155,7 @@ export default function Category() {
   }
 
   function handleMonthChange(y: number, m: number) {
-    setYear(y)
-    setMonth(m)
+    setSelectedMonth(y, m)
     setSearchParams({ year: String(y), month: String(m) }, { replace: true })
   }
 
