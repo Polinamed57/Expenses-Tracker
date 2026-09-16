@@ -14,6 +14,7 @@ import { useExpenses, useSeedRecurringExpenses } from '@/hooks/useExpenses'
 import { useProfile } from '@/hooks/useProfile'
 import { useSelectedMonth } from '@/hooks/useSelectedMonth'
 import { useAuth } from '@/providers/AuthProvider'
+import { DEMO_EMAIL } from '@/lib/demo'
 import { QuickAddExpense } from '@/components/expenses/QuickAddExpense'
 import { AddOneTimeDialog } from '@/components/expenses/AddOneTimeDialog'
 import { OneTimeList } from '@/components/expenses/OneTimeList'
@@ -217,8 +218,26 @@ export default function Dashboard() {
     setIncomeDialogOpen(false)
   }
 
+  const isDemoUser = session?.user.email === DEMO_EMAIL
+
   return (
     <PageShell>
+      {isDemoUser && (
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(124,58,237,0.12))',
+            border: '1px solid rgba(124,58,237,0.25)',
+            color: 'var(--foreground)',
+            fontSize: '14px',
+            textAlign: 'center',
+          }}
+        >
+          You're viewing a demo account. Feel free to add expenses and explore.
+        </div>
+      )}
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div>

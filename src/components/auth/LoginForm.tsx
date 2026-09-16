@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/demo'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ type FormValues = z.infer<typeof schema>
 export function LoginForm() {
   const navigate = useNavigate()
   const [serverError, setServerError] = useState<string | null>(null)
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
 
   const {
     register,
@@ -33,6 +35,21 @@ export function LoginForm() {
     })
     if (error) {
       setServerError('Invalid email or password')
+      return
+    }
+    navigate('/')
+  }
+
+  async function handleDemoLogin() {
+    setServerError(null)
+    setIsDemoLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    })
+    setIsDemoLoading(false)
+    if (error) {
+      setServerError('Demo is temporarily unavailable')
       return
     }
     navigate('/')
@@ -99,6 +116,17 @@ export function LoginForm() {
         }}
       >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleDemoLogin}
+        disabled={isDemoLoading || isSubmitting}
+        className="w-full"
+        style={{ height: '44px', fontSize: '15px', fontWeight: 500 }}
+      >
+        {isDemoLoading ? 'Opening demo...' : 'View demo'}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
